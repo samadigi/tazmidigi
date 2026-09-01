@@ -142,7 +142,7 @@
       direction: rtl;
       font-family: 'Amiri', serif;
       line-height: 2.35;
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       text-align: right;
     }
 
@@ -153,7 +153,7 @@
 
     /* Mobile active word token touch feedback */
     .ayah-word-token {
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
       -webkit-user-select: none;
       display: inline-block;
@@ -244,10 +244,7 @@
 
         <!-- LARGE TILTED ROUNDED HERO CARD WITH DOUBLE ACCENT OUTLINE -->
         <div id="hero-card-wrap" class="relative w-full mt-6 px-2 py-4 transition-transform duration-300 ease-out">
-          <!-- Layer Double Accent Outline -->
           <div class="accent-outline-layer"></div>
-
-          <!-- Moving Border Wrapper -->
           <div class="moving-border-box shadow-2xl shadow-emerald-500/10 transform rotate-1 hover:rotate-0 transition duration-500">
             <div class="moving-border-inner bg-slate-900 p-4 text-left space-y-3">
               <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
@@ -329,14 +326,12 @@
 
     <!-- VIEW 2: BERANDA DASHBOARD -->
     <section id="view-home" class="space-y-5 hidden">
-      <!-- Greeting & Title -->
       <div class="glass-card p-4 rounded-3xl border border-slate-800 relative overflow-hidden">
         <div class="relative z-10 space-y-1">
           <span class="text-[11px] font-semibold text-blue-400 tracking-wide uppercase">PENTASMI AL-QUR'AN</span>
           <h2 class="text-lg font-extrabold text-white">Teman AI Menyimak Hafalan</h2>
           <p class="text-xs text-slate-300">Siap menyimak dan merekam ujian hafalan hari ini?</p>
         </div>
-        <!-- Decorative Glow -->
         <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
       </div>
 
@@ -352,7 +347,7 @@
           </div>
         </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
+        <div class="glass-card p-3.5 rounded-2xl border border-emerald-500/20 flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg">
             ✅
           </div>
@@ -397,7 +392,6 @@
         </div>
 
         <div id="homeRecentList" class="space-y-2">
-          <!-- Populated by JS -->
           <div class="p-4 text-center text-xs text-slate-500 glass-card rounded-2xl">
             Belum ada data tasmi tersimpan.
           </div>
@@ -416,29 +410,23 @@
         </div>
 
         <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3.5">
-          <!-- Nama Siswa -->
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">Nama Siswa / Peserta</label>
             <input id="inputStudentName" type="text" placeholder="Contoh: Muhammad Fatih" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
           </div>
 
-          <!-- Pilih Juz -->
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">Juz</label>
             <select id="selectJuz" onchange="onJuzChange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
-              <!-- Juz 1-30 -->
             </select>
           </div>
 
-          <!-- Pilih Surat -->
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">Surat</label>
             <select id="selectSurah" onchange="onSurahChange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
-              <!-- Surah list -->
             </select>
           </div>
 
-          <!-- Rentang Ayat: Mulai & Akhir -->
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-medium text-slate-300 mb-1">Ayat Mulai</label>
@@ -451,13 +439,11 @@
           </div>
         </div>
 
-        <!-- Ringkasan Target -->
         <div class="glass-card p-3.5 rounded-2xl border border-blue-500/30 bg-blue-950/20 text-center space-y-1">
           <p class="text-[11px] text-blue-300 font-medium">Ringkasan Ujian:</p>
           <p id="targetSummaryText" class="text-sm font-extrabold text-white">Juz 30 — QS. An-Naba' (Ayat 1–10)</p>
         </div>
 
-        <!-- Button Start Tasmi -->
         <button id="btnStartLiveSession" onclick="startLiveTasmiSession()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white font-extrabold text-base shadow-xl shadow-blue-600/30 flex items-center justify-center space-x-2 transition active:scale-95">
           <span class="text-xl">🎙️</span>
           <span>Mulai Menyimak & Buka Mic</span>
@@ -487,7 +473,7 @@
           </div>
         </div>
 
-        <!-- Mobile Mic Status Alert, Realtime Audio Wave, & Language Selector -->
+        <!-- Mobile Mic Status Alert & Live Wave Indicator -->
         <div class="glass-card p-2.5 rounded-2xl border border-blue-500/30 space-y-2">
           <div class="flex items-center justify-between text-xs">
             <div class="flex items-center space-x-2">
@@ -495,7 +481,6 @@
               <span id="mobileMicStatusText" class="text-slate-200 text-[11px] font-semibold">Mikrofon HP Mendengar...</span>
             </div>
             
-            <!-- Realtime Audio Wave Visualizer Bars -->
             <div id="liveAudioWaveContainer" class="flex items-center space-x-1 h-4 px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800" title="Deteksi Gelombang Suara">
               <span class="wave-bar w-1 bg-emerald-400 rounded-full h-2"></span>
               <span class="wave-bar w-1 bg-emerald-400 rounded-full h-3"></span>
@@ -515,7 +500,6 @@
               <button id="btnLangIndo" onclick="switchSpeechLang('id-ID')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold border border-slate-700 hover:text-white transition">
                 🇮🇩 Latin
               </button>
-              <!-- Simulation button for instant testing -->
               <button onclick="simulateVoiceRecognition()" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 hover:bg-amber-500/30 transition" title="Simulasi Suara Santri untuk Tes Cepat">
                 ⚡ Tes Baca
               </button>
@@ -533,7 +517,7 @@
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Dibaca</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Salah</span>
           </div>
-          <span class="text-slate-400 italic">💡 Sentuh kata jika bising</span>
+          <span class="text-emerald-400 font-medium">✨ Otomatis Deteksi AI</span>
         </div>
 
         <!-- CURRENT AYAT DISPLAY (FOCAL CARD) -->
@@ -559,7 +543,6 @@
 
           <!-- Indikator Kata Terdeteksi -->
           <div id="liveWordTracker" class="flex flex-wrap gap-1.5 justify-end pt-1">
-            <!-- Word chips populated by AI -->
           </div>
 
           <!-- Terjemahan / Transliterasi -->
@@ -579,7 +562,6 @@
             <p id="liveTranscriptText" class="text-xs text-emerald-300 font-mono italic min-h-[20px]">
               "Mendengarkan bacaan hafalan..."
             </p>
-            <!-- Realtime Matching Meter Bar -->
             <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
               <div id="liveMatchMeter" class="bg-gradient-to-r from-amber-500 via-emerald-400 to-accent-emerald h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
@@ -644,7 +626,6 @@
             <span id="audioDurationText" class="text-[11px] font-mono text-slate-400">00:00</span>
           </div>
 
-          <!-- Audio element with robust playback controls -->
           <audio id="recordedAudioPlayer" class="w-full h-10 rounded-lg outline-none bg-slate-900" controls preload="auto"></audio>
 
           <div class="flex items-center justify-between pt-1">
@@ -661,7 +642,6 @@
             <span class="text-rose-400">❌</span> Daftar Catatan / Kesalahan
           </h3>
           <div id="resultErrorList" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
-            <!-- Populated by JS -->
             <p class="text-xs text-emerald-400 italic">Alhamdulillah, tidak ada kesalahan tercatat!</p>
           </div>
         </div>
@@ -711,7 +691,6 @@
         <p class="text-xs text-slate-400">Kelola preferensi, backend GAS, dan profil aplikasi</p>
       </div>
 
-      <!-- Theme & Audio Preferences -->
       <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
         <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Tampilan & Mikrofon</h3>
         
@@ -736,7 +715,6 @@
         </div>
       </div>
 
-      <!-- Google Apps Script Backend URL Endpoint -->
       <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
         <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Backend Google Apps Script</h3>
         <div>
@@ -746,7 +724,6 @@
         <p class="text-[10px] text-slate-400 leading-relaxed">Data tasmi dan riwayat otomatis disinkronkan ke Spreadsheet Anda melalui endpoint di atas.</p>
       </div>
 
-      <!-- Admin Panel Form (Footer & Logo) -->
       <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
         <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Pengaturan Lembaga & Footer</h3>
 
@@ -765,7 +742,6 @@
         </button>
       </div>
 
-      <!-- Logout / Session Info -->
       <div id="settingsSessionBlock" class="glass-card p-4 rounded-3xl border border-slate-800 space-y-2">
         <p class="text-xs text-slate-400">Masuk sebagai: <span id="settingsUserRole" class="font-bold text-white">Penguji / Guru</span></p>
         <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-semibold text-xs border border-rose-700/50 transition">
@@ -792,25 +768,18 @@
 
   <!-- BOTTOM NAVIGATION BAR (STICKY MOBILE) -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-800/90 py-2 px-6 max-w-md mx-auto flex items-center justify-between">
-    <!-- Tab Beranda -->
     <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center space-y-1 text-blue-500 transition">
       <span class="text-xl">🏠</span>
       <span class="text-[10px] font-bold">Beranda</span>
     </button>
-
-    <!-- Tab Tasmi -->
     <button onclick="switchTab('tasmi')" id="nav-btn-tasmi" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
       <span class="text-xl">📖</span>
       <span class="text-[10px] font-medium">Tasmi</span>
     </button>
-
-    <!-- Tab Riwayat -->
     <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
       <span class="text-xl">📊</span>
       <span class="text-[10px] font-medium">Riwayat</span>
     </button>
-
-    <!-- Tab Pengaturan -->
     <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
       <span class="text-xl">⚙️</span>
       <span class="text-[10px] font-medium">Pengaturan</span>
@@ -855,9 +824,10 @@
     </div>
   </div>
 
+  <!-- JAVASCRIPT: QURAN DATABASE & INTELLIGENT FUZZY SPEECH MATCHER -->
   <script>
     /* ===============================================================
-       1. DATA AL-QUR'AN (JUZ 30 LENGKAP & PROMINENT SURAHS DATASET)
+       1. DATA AL-QUR'AN DATASET LENGKAP
        =============================================================== */
     const QURAN_SURAHS = [
       { number: 1, name: "Al-Fatihah", arName: "الفاتحة", juz: 1, totalAyat: 7 },
@@ -900,7 +870,7 @@
       { number: 114, name: "An-Nas", arName: "الناس", juz: 30, totalAyat: 6 }
     ];
 
-    // Embedded Database Teks Ayat untuk Sesi Live Offline / Preview
+    // Embedded Database Teks Ayat
     const AYAT_DATABASE = {
       // QS. Al-Fatihah (1)
       "1_1": { ar: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ", latin: "Bismillaahir-rahmaanir-rahiim", tr: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
@@ -909,7 +879,7 @@
       "1_4": { ar: "مَـٰلِكِ يَوْمِ ٱلدِّينِ", latin: "Maaliki yawmid-diin", tr: "Pemilik hari pembalasan." },
       "1_5": { ar: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", latin: "Iyyaaka na'budu wa iyyaaka nasta'iin", tr: "Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan." },
       "1_6": { ar: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", latin: "Ihdinash-shiraathal-mustaqiim", tr: "Tunjukilah kami jalan yang lurus," },
-      "1_7": { ar: "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ", latin: "Shiraathalladziina an'amta 'alaihim ghairil-maghdhuubi 'alaihim wa ladh-dhaalliin", tr: "(yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya; bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat." },
+      "1_7": { ar: "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ", latin: "Shiraathalladziina an'amta 'alaihim ghairil-maghdhuubi 'alaihim wa ladh-dhaalliin", tr: "(yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya." },
 
       // QS. An-Naba' (78)
       "78_1": { ar: "عَمَّ يَتَسَآءَلُونَ", latin: "Amma yatasaa'aluun", tr: "Tentang apakah mereka saling bertanya-tanya?" },
@@ -983,7 +953,6 @@
       waveAnimFrame: null
     };
 
-    // Helper Toast Notification
     function showToast(message, icon = 'ℹ️') {
       const toast = document.getElementById('customToast');
       document.getElementById('toastIcon').innerText = icon;
@@ -996,14 +965,20 @@
       }, 2500);
     }
 
-    // Helper Normalisasi Fonetik & Huruf Arab / Latin
+    /* ===============================================================
+       NORMALISASI KHUSUS RASM UTHMANI & SPEECH RECOGNITION
+       =============================================================== */
     function normalizeArabicText(text) {
       if (!text) return '';
       return text
-        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '') // Hapus Harakat, Tanda Tajwid, Tatweel
+        // 1. Ubah alif khanjariyah (\u0670) dan huruf kecil Uthmani menjadi huruf penuh
+        .replace(/[\u0670\u06E5\u06E6]/g, 'ا')
+        // 2. Hapus Harakat, Tanween, Tanda Waqaf, Tatweel
+        .replace(/[\u064B-\u065F\u06D6-\u06ED\u0610-\u061A\u08F0-\u08FF\u0640]/g, '')
+        // 3. Normalisasi bentuk Alif
         .replace(/[إأآٱ]/g, 'ا')
         .replace(/ة/g, 'ه')
-        .replace(/ى/g, 'ي')
+        .replace(/[ىي]/g, 'ي')
         .replace(/ؤ/g, 'و')
         .replace(/ئ/g, 'ي')
         .replace(/ء/g, '')
@@ -1031,9 +1006,41 @@
         .replace(/qul|kul/g, 'kul')
         .replace(/falaq|falak/g, 'falak')
         .replace(/shamad|samad/g, 'samad')
+        .replace(/a'udzu|audzu|auzu|a'uzu/g, 'auzu')
         .replace(/[^a-z0-9\s]/g, '')
         .replace(/\s+/g, ' ')
         .trim();
+    }
+
+    // Levenshtein Distance for Phonetic Similarity
+    function getLevenshteinDistance(a, b) {
+      if (a.length === 0) return b.length;
+      if (b.length === 0) return a.length;
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    function getWordSimilarity(str1, str2) {
+      if (!str1 || !str2) return 0;
+      if (str1 === str2) return 1.0;
+      const distance = getLevenshteinDistance(str1, str2);
+      const maxLen = Math.max(str1.length, str2.length);
+      return maxLen === 0 ? 1.0 : (1.0 - (distance / maxLen));
     }
 
     // Fuzzy Token Matcher Khusus Dialek & Ejaan Android
@@ -1055,13 +1062,16 @@
         return true;
       }
 
-      // 3. Cek variasi partikel waw / fa / lam / ba
-      if (normTargetAr.length > 2 && (normTargetAr.startsWith('و') || normTargetAr.startsWith('ف') || normTargetAr.startsWith('ب') || normTargetAr.startsWith('ل'))) {
-        const withoutPrefix = normTargetAr.slice(1);
-        if (normSpokenAll.includes(withoutPrefix)) return true;
+      // 3. Cek variasi partikel awalan (waw / fa / lam / ba / alif-lam)
+      const prefixes = ['و', 'ف', 'ب', 'ل', 'ال'];
+      for (const p of prefixes) {
+        if (normTargetAr.startsWith(p) && normTargetAr.length > p.length + 1) {
+          const rootWord = normTargetAr.slice(p.length);
+          if (normSpokenAll.includes(rootWord)) return true;
+        }
       }
 
-      // 4. Cek token per token
+      // 4. Cek token per token dengan skor kemiripan Levenshtein
       for (const token of spokenTokens) {
         if (!token || token.length < 2) continue;
 
@@ -1069,13 +1079,17 @@
           if (token === normTargetAr || token.includes(normTargetAr) || normTargetAr.includes(token)) {
             return true;
           }
-          if (Math.abs(token.length - normTargetAr.length) <= 1 && normTargetAr.startsWith(token.slice(0, 2))) {
+          // Kemiripan >= 60%
+          if (getWordSimilarity(normTargetAr, token) >= 0.60) {
             return true;
           }
         }
 
         if (normTargetLt) {
           if (token === normTargetLt || token.includes(normTargetLt) || normTargetLt.includes(token)) {
+            return true;
+          }
+          if (getWordSimilarity(normTargetLt, token) >= 0.60) {
             return true;
           }
         }
@@ -1491,7 +1505,6 @@
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         liveState.mediaStream = stream;
 
-        // Detect supported MIME type
         let mimeType = 'audio/webm';
         if (typeof MediaRecorder !== 'undefined') {
           if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
@@ -1533,7 +1546,7 @@
             }
           };
 
-          recorder.start(500); // chunk every 500ms for safety
+          recorder.start(500);
           liveState.mediaRecorder = recorder;
         }
 
@@ -1603,19 +1616,13 @@
         waveAnimFrame: null
       };
 
-      // UI Switch ke Live Mode
       document.getElementById('tasmi-step-setup').classList.add('hidden');
       document.getElementById('tasmi-step-live').classList.remove('hidden');
       document.getElementById('tasmi-step-result').classList.add('hidden');
 
-      // Start Duration Timer & Tampilkan Ayat Pertama
       startLiveTimer();
       renderCurrentLiveAyah();
-
-      // Mulai Recording Audio Stream & Visualizer
       startAudioRecordingStream();
-
-      // Inisialisasi Speech Recognition LANGSUNG secara sinkron
       initSpeechRecognition();
       showToast('Sesi dimulai! Silakan membaca hafalan...', '🎙️');
     }
@@ -1623,7 +1630,7 @@
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode sentuh kata aktif.', 'amber');
+        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Sentuh kata jika perlu.', 'amber');
         return;
       }
 
@@ -1635,8 +1642,6 @@
         }
 
         const recognition = new SpeechRecognition();
-        
-        // Android Fix: continuous = false for mobile to force reliable onresult emission
         recognition.continuous = !isMobileDevice;
         recognition.interimResults = true;
         recognition.maxAlternatives = 5;
@@ -1674,7 +1679,7 @@
           if (e.error === 'not-allowed') {
             updateMobileStatusUI('Izin Mic ditolak. Ketuk "Segarkan Mic".', 'rose');
           } else if (e.error === 'network') {
-            updateMobileStatusUI('Koneksi internet diperlukan. Coba ubah mode ke Latin.', 'amber');
+            updateMobileStatusUI('Koneksi internet diperlukan. Coba mode Latin.', 'amber');
           } else if (e.error === 'no-speech') {
             updateMobileStatusUI('Menyimak suara bacaan santri...', 'emerald');
           }
@@ -1682,7 +1687,6 @@
 
         recognition.onend = () => {
           liveState.isRecognitionRunning = false;
-          // Android Auto-Reconnect Loop
           if (liveState.isListening) {
             setTimeout(() => {
               if (liveState.isListening && !liveState.isRecognitionRunning) {
@@ -1691,7 +1695,7 @@
                   recognition.start();
                 } catch (err) {}
               }
-            }, 80);
+            }, 60);
           }
         };
 
@@ -1758,8 +1762,8 @@
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
-      // Otomatisasi AI: Tuntas Benar jika membaca >= 60% kata atau tinggal 1 kata
-      if (matchScore >= 60 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1)) {
+      // Otomatisasi AI: Tuntas Benar jika membaca >= 50% kata atau tinggal 1 kata
+      if (matchScore >= 50 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1) || (totalWords === 1 && liveState.matchedWordIndices.size === 1)) {
         document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         
@@ -1781,7 +1785,6 @@
       }
     }
 
-    // Interactive Touch Support (Bantuan jika lingkungan bising)
     function onTouchAyahWord(idx) {
       if (!liveState.currentAyahWords || !liveState.currentAyahWords[idx]) return;
       markWordTokenSuccess(idx, liveState.currentAyahWords[idx]);
@@ -1791,14 +1794,13 @@
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
-      if (matchScore >= 60 || liveState.matchedWordIndices.size >= totalWords - 1) {
+      if (matchScore >= 50 || liveState.matchedWordIndices.size >= totalWords - 1) {
         document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         triggerAutoAdvance(true);
       }
     }
 
-    // Fast Recitation Simulator for instant verification
     function simulateVoiceRecognition() {
       const currentKey = `${liveState.surah.number}_${liveState.currentAyahIndex}`;
       const targetAyah = AYAT_DATABASE[currentKey];
@@ -1820,7 +1822,7 @@
         if (countdownEl) countdownEl.classList.add('hidden');
         liveState.autoAdvanceTimer = null;
         markCurrentAyah(isSuccess, errorMessage);
-      }, 900);
+      }, 800);
     }
 
     function startLiveTimer() {
@@ -1915,13 +1917,11 @@
         try { liveState.audioContext.close(); } catch(e) {}
       }
 
-      // Stop speech recognition
       if (liveState.speechRecognition) {
         liveState.isListening = false;
         try { liveState.speechRecognition.stop(); } catch (e) {}
       }
 
-      // Stop MediaRecorder and trigger onstop
       if (liveState.mediaRecorder && liveState.mediaRecorder.state !== 'inactive') {
         try {
           liveState.mediaRecorder.stop();
@@ -1930,7 +1930,6 @@
         }
       }
 
-      // Release mic stream tracks
       if (liveState.mediaStream) {
         try {
           liveState.mediaStream.getTracks().forEach(track => track.stop());
@@ -1996,14 +1995,12 @@
         status: 'Completed'
       };
 
-      // Simpan ke Local Storage
       let localHistory = JSON.parse(localStorage.getItem('preview_tasmi_history') || '[]');
       payload.tasmiId = 'TSM-' + new Date().getTime();
       payload.createdAt = new Date().toISOString();
       localHistory.unshift(payload);
       localStorage.setItem('preview_tasmi_history', JSON.stringify(localHistory));
 
-      // Kirim ke Google Apps Script Web App Backend
       if (isGASRuntime()) {
         google.script.run.apiSaveTasmiSession(payload);
       } else {
