@@ -1004,21 +1004,27 @@
       const normTargetAr = normalizeArabicText(targetWordAr);
       const normTargetLt = normalizeLatinPhonetics(targetWordLt || '');
       const normSpokenAll = normalizeArabicText(spokenCombinedText);
+      const normSpokenLtAll = normalizeLatinPhonetics(spokenCombinedText);
 
       if (!normTargetAr && !normTargetLt) return false;
 
-      // 1. Cek langsung substring dalam keseluruhan transkrip suara
+      // 1. Cek langsung substring dalam keseluruhan transkrip suara Arab
       if (normTargetAr && normTargetAr.length >= 2 && normSpokenAll.includes(normTargetAr)) {
         return true;
       }
 
-      // 2. Cek variasi partikel waw / fa / lam (Contoh: "ولم" vs "و لم")
-      if (normTargetAr.startsWith('و') && normTargetAr.length > 2) {
-        const withoutWaw = normTargetAr.slice(1);
-        if (normSpokenAll.includes(withoutWaw)) return true;
+      // 2. Cek langsung substring dalam keseluruhan transkrip suara Latin
+      if (normTargetLt && normTargetLt.length >= 2 && normSpokenLtAll.includes(normTargetLt)) {
+        return true;
       }
 
-      // 3. Cek token per token
+      // 3. Cek variasi partikel waw / fa / lam / ba (Contoh: "ولم" vs "و لم", "برب" vs "ب رب")
+      if (normTargetAr.length > 2 && (normTargetAr.startsWith('و') || normTargetAr.startsWith('ف') || normTargetAr.startsWith('ب'))) {
+        const withoutPrefix = normTargetAr.slice(1);
+        if (normSpokenAll.includes(withoutPrefix)) return true;
+      }
+
+      // 4. Cek token per token
       for (const token of spokenTokens) {
         if (!token || token.length < 2) continue;
 
@@ -1026,7 +1032,6 @@
           if (token === normTargetAr || token.includes(normTargetAr) || normTargetAr.includes(token)) {
             return true;
           }
-          // Toleransi selisih 1 karakter fonetik
           if (Math.abs(token.length - normTargetAr.length) <= 1 && normTargetAr.startsWith(token.slice(0, 2))) {
             return true;
           }
@@ -1434,9 +1439,6 @@
         lastRecognizedText: ''
       };
 
-      // Inisialisasi Speech Recognition LANGSUNG secara sinkron (Krusial untuk Chrome Mobile)
-      initSpeechRecognition();
-
       // UI Switch ke Live Mode
       document.getElementById('tasmi-step-setup').classList.add('hidden');
       document.getElementById('tasmi-step-live').classList.remove('hidden');
@@ -1445,6 +1447,9 @@
       // Start Duration Timer & Tampilkan Ayat Pertama
       startLiveTimer();
       renderCurrentLiveAyah();
+
+      // Inisialisasi Speech Recognition LANGSUNG secara sinkron (Krusial untuk Chrome Mobile)
+      initSpeechRecognition();
       showToast('Sesi dimulai! Silakan membaca hafalan...', '🎙️');
     }
 
@@ -1457,7 +1462,9 @@
 
       try {
         if (liveState.speechRecognition) {
-          try { liveState.speechRecognition.stop(); } catch(e) {}
+          try { 
+            liveState.speechRecognition.abort(); 
+          } catch(e) {}
         }
 
         const recognition = new SpeechRecognition();
@@ -1476,10 +1483,13 @@
           }
         };
 
+        recognition.onspeechstart = () => {
+          updateMobileStatusUI('Suara Santri Masuk...', 'emerald');
+        };
+
         recognition.onresult = (event) => {
           let fullTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            // Ambil semua alternatif pengenalan untuk toleransi dialek HP
             for (let j = 0; j < event.results[i].length; j++) {
               fullTranscript += ' ' + event.results[i][j].transcript;
             }
@@ -1495,6 +1505,8 @@
             updateMobileStatusUI('Izin Mic belum aktif di HP. Ketuk "Segarkan Mic".', 'rose');
           } else if (e.error === 'network') {
             updateMobileStatusUI('Koneksi internet diperlukan untuk pengenalan suara HP.', 'amber');
+          } else if (e.error === 'no-speech') {
+            updateMobileStatusUI('Menunggu suara bacaan santri...', 'emerald');
           }
         };
 
@@ -1507,15 +1519,14 @@
                   recognition.start();
                 } catch (err) {}
               }
-            }, 200);
+            }, 250);
           }
         };
 
         recognition.start();
         liveState.speechRecognition = recognition;
-        liveState.isListening = true;
       } catch (e) {
-        console.log('Speech recognition instant launch error:', e);
+        console.log('Speech recognition launch error:', e);
         updateMobileStatusUI('Ketuk "Segarkan Mic" untuk memulai AI.', 'amber');
       }
     }
@@ -1575,8 +1586,8 @@
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
-      // Otomatisasi AI: Tuntas Benar jika membaca >= 65% kata atau tinggal 1 kata
-      if (matchScore >= 65 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1)) {
+      // Otomatisasi AI: Tuntas Benar jika membaca >= 60% kata atau tinggal 1 kata
+      if (matchScore >= 60 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1)) {
         document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         
