@@ -2,8 +2,8 @@
 <html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PENTASMI AL-QUR'AN — Teman AI Menyimak Hafalan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PENTASMI AL-QUR'AN — Platform AI Menyimak & Evaluasi Hafalan (Desktop & PC)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -46,14 +46,14 @@
             }
           },
           animation: {
-            'spin-slow': 'spin 8s linear infinite',
-            'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'border-run': 'borderRun 4s linear infinite',
+            'spin-slow': 'spin 10s linear infinite',
+            'pulse-glow': 'pulseGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'border-run': 'borderRun 5s linear infinite',
           },
           keyframes: {
             pulseGlow: {
               '0%, 100%': { opacity: '0.9', transform: 'scale(1)' },
-              '50%': { opacity: '0.4', transform: 'scale(1.05)' },
+              '50%': { opacity: '0.4', transform: 'scale(1.03)' },
             },
             borderRun: {
               '0%': { transform: 'rotate(0deg)' },
@@ -66,18 +66,19 @@
   </script>
 
   <style>
-    /* Custom Styling & Glassmorphism */
+    /* Custom Desktop Glassmorphism & Shadows */
     .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
     }
     .light .glass-card {
       background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(226, 232, 240, 0.9);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.06);
     }
     
     /* Green Gradient Text */
@@ -90,7 +91,7 @@
     /* Moving Border Light Wrapper */
     .moving-border-box {
       position: relative;
-      border-radius: 1.5rem;
+      border-radius: 1.75rem;
       overflow: hidden;
       padding: 2px;
     }
@@ -107,707 +108,805 @@
     }
     .moving-border-inner {
       position: relative;
-      border-radius: calc(1.5rem - 2px);
+      border-radius: calc(1.75rem - 2px);
       z-index: 1;
     }
 
-    /* Double-layer Accent Outline */
+    /* Double-layer Accent Outline for Desktop Hero */
     .accent-outline-layer {
       position: absolute;
-      inset: -6px;
-      border-radius: 1.75rem;
-      border: 2px dashed rgba(182, 255, 0, 0.35);
+      inset: -8px;
+      border-radius: 2rem;
+      border: 2px dashed rgba(182, 255, 0, 0.4);
       transform: rotate(-1.5deg);
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Touch-target optimization for Mobile */
-    button, a, input, select {
-      touch-action: manipulation;
-      cursor: pointer;
-    }
-
-    /* Hide scrollbar for clean mobile UI */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    /* Quranic Text typography */
+    /* Quranic Text typography (Large Desktop Presentation) */
     .ayah-text-ar {
       direction: rtl;
       font-family: 'Amiri', serif;
-      line-height: 2.35;
-      font-size: 1.85rem;
+      line-height: 2.6;
+      font-size: 2.4rem;
       text-align: right;
     }
 
-    /* Live Audio Wave visualizer bar */
+    /* Custom Scrollbar for Desktop Tables & Lists */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.7);
+    }
+
+    /* Waveform visualizer bar */
     .wave-bar {
       transition: height 0.08s ease-in-out;
     }
 
-    /* Mobile active word token touch feedback */
+    /* Interactive Word Token Hover & Active States */
     .ayah-word-token {
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
-      -webkit-user-select: none;
       display: inline-block;
+      cursor: pointer;
     }
-    .ayah-word-token:active {
-      transform: scale(0.92);
+    .ayah-word-token:hover {
+      transform: translateY(-2px);
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen transition-colors duration-300 antialiased pb-24 overflow-x-hidden">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen transition-colors duration-300 antialiased overflow-x-hidden flex flex-col">
 
   <!-- SPOTLIGHT CURSOR BACKGROUND EFFECT -->
-  <div id="cursor-spotlight" class="pointer-events-none fixed inset-0 z-0 opacity-40 transition-opacity duration-300" style="background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(142, 255, 0, 0.08), transparent 80%);"></div>
+  <div id="cursor-spotlight" class="pointer-events-none fixed inset-0 z-0 opacity-40 transition-opacity duration-300" style="background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(142, 255, 0, 0.08), transparent 80%);"></div>
 
   <!-- TOAST NOTIFICATION MODAL -->
-  <div id="customToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl glass-card border border-slate-700 text-xs font-semibold text-white shadow-2xl flex items-center space-x-2 transition-all duration-300 transform -translate-y-20 opacity-0 pointer-events-none">
-    <span id="toastIcon">ℹ️</span>
+  <div id="customToast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl glass-card border border-slate-700 text-sm font-semibold text-white shadow-2xl flex items-center space-x-3 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none">
+    <span id="toastIcon" class="text-base">ℹ️</span>
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <!-- TOP APP HEADER / NAVBAR -->
-  <header class="sticky top-0 z-40 glass-card border-b border-slate-800/80 px-4 py-3 flex items-center justify-between transition-colors">
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateLandingOrHome()">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-accent-emerald flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-lg">
-        📖
+  <!-- TOP APP HEADER / NAVBAR (DESKTOP & LAPTOP LAYOUT) -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-800/80 px-6 lg:px-12 py-3.5 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateLandingOrHome()">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-blue-500 to-accent-emerald flex items-center justify-center shadow-lg shadow-blue-500/25 text-white font-bold text-xl">
+          📖
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-extrabold text-base lg:text-lg tracking-tight text-white flex items-center gap-1.5">
+              PENTASMI <span class="text-xs px-2 py-0.5 rounded-lg bg-blue-500/20 text-blue-400 font-bold border border-blue-400/30">AI DESKTOP</span>
+            </h1>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">Platform Cerdas Menyimak & Uji Hafalan Al-Qur'an Realtime</p>
+        </div>
       </div>
-      <div>
-        <h1 class="font-extrabold text-sm tracking-tight text-white dark:text-white flex items-center gap-1.5">
-          PENTASMI <span class="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-semibold border border-blue-400/30">AI</span>
-        </h1>
-        <p class="text-[10px] text-slate-400 font-medium">Teman Menyimak Hafalan</p>
+
+      <!-- Desktop Navigation Menu Links (NO BOTTOM NAVBAR) -->
+      <nav id="desktopNavLinks" class="hidden md:flex items-center space-x-1 lg:space-x-2 bg-slate-900/70 p-1.5 rounded-2xl border border-slate-800">
+        <button onclick="switchTab('home')" id="nav-btn-home" class="px-4 py-2 rounded-xl text-xs font-bold text-blue-400 bg-blue-600/20 border border-blue-500/30 transition flex items-center space-x-2">
+          <span>🏠</span>
+          <span>Beranda</span>
+        </button>
+        <button onclick="switchTab('tasmi')" id="nav-btn-tasmi" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2">
+          <span>📖</span>
+          <span>Sesi Tasmi</span>
+        </button>
+        <button onclick="switchTab('history')" id="nav-btn-history" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2">
+          <span>📊</span>
+          <span>Riwayat Ujian</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-btn-settings" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2">
+          <span>⚙️</span>
+          <span>Pengaturan</span>
+        </button>
+      </nav>
+
+      <!-- Action & Auth Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- GAS Online Indicator -->
+        <span id="gasSyncBadge" class="hidden sm:inline-flex text-xs px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold items-center gap-1.5" title="Tersambung ke Google Spreadsheet">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Google Sheets Sync
+        </span>
+
+        <!-- Dark / Light Mode Toggle -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-base border border-slate-700/50 transition shadow-sm" title="Ganti Tema">
+          ☀️
+        </button>
+
+        <!-- User / Login Button -->
+        <button id="authHeaderBtn" onclick="handleAuthHeaderClick()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:opacity-90 text-white text-xs font-bold shadow-md shadow-blue-600/30 flex items-center space-x-2 transition">
+          <span>Masuk Penguji</span>
+        </button>
       </div>
-    </div>
-
-    <div class="flex items-center space-x-2">
-      <!-- Sync Status Indicator with GAS Backend -->
-      <span id="gasSyncBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium flex items-center gap-1" title="Tersambung ke Google Spreadsheet">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> GAS Online
-      </span>
-
-      <!-- Dark / Light Mode Toggle -->
-      <button id="themeToggleBtn" onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm border border-slate-700/50 transition" title="Ganti Tema">
-        ☀️
-      </button>
-
-      <!-- User / Login Button -->
-      <button id="authHeaderBtn" onclick="handleAuthHeaderClick()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-600/30 flex items-center space-x-1.5 transition">
-        <span>Masuk</span>
-      </button>
     </div>
   </header>
 
-  <!-- CONTAINER UTAMA -->
-  <main class="relative z-10 max-w-md mx-auto px-4 py-4">
+  <!-- MAIN CONTAINER (DESKTOP / LAPTOP WIDTH: MAX-W-7XL) -->
+  <main class="relative z-10 max-w-7xl w-full mx-auto px-6 lg:px-12 py-8 flex-1">
 
-    <!-- VIEW 1: PRE-LOGIN LANDING PAGE -->
-    <section id="view-landing" class="space-y-6">
-      <!-- HERO SECTION -->
-      <div id="hero-container" class="relative pt-2 pb-6 flex flex-col items-center text-center space-y-4">
+    <!-- VIEW 1: PRE-LOGIN LANDING PAGE (DESKTOP SPLIT HERO LAYOUT) -->
+    <section id="view-landing" class="space-y-12">
+      <!-- SPLIT HERO SECTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pt-4 pb-8">
         
-        <!-- Status Badge -->
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900/80 border border-emerald-500/30 text-xs text-emerald-400 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-accent-emerald animate-pulse"></span>
-          <span class="font-medium">AI Realtime Speech Evaluation</span>
-        </div>
-
-        <!-- Headline Utama & Green Gradient Accent -->
-        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-          Simak & Uji Hafalan <br>
-          <span class="text-gradient-green text-3xl sm:text-4xl">Presisi Ayat Realtime</span>
-        </h2>
-
-        <p class="text-xs sm:text-sm text-slate-300 max-w-xs leading-relaxed">
-          AI cerdas yang mendengarkan melalui mikrofon HP Anda, mencocokkan teks ayat Al-Qur'an secara langsung, dan merekam suara siswa untuk evaluasi guru.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col w-full space-y-2.5 pt-2">
-          <button id="btnHeroStartTasmi" onclick="startDirectTasmi()" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 hover:opacity-95 text-white font-bold text-sm shadow-xl shadow-blue-600/25 flex items-center justify-center space-x-2 transition transform active:scale-95">
-            <span class="text-lg">🎙️</span>
-            <span>Mulai Tasmi Sekarang</span>
-          </button>
+        <!-- Left Column: Headline, Description, & CTAs (45%) -->
+        <div class="lg:col-span-6 space-y-6 text-left">
           
-          <button onclick="openLoginModal()" class="w-full py-3 px-6 rounded-2xl bg-slate-900/70 hover:bg-slate-800 text-slate-200 font-semibold text-xs border border-slate-700/60 flex items-center justify-center space-x-2 transition">
-            <span>Masuk Panel Penguji / Guru</span>
-          </button>
+          <div class="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/30 text-xs font-semibold text-emerald-400 shadow-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-accent-emerald animate-pulse"></span>
+            <span>AI Realtime Speech Evaluation & Audio Recorder</span>
+          </div>
+
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            Simak & Uji Hafalan <br>
+            <span class="text-gradient-green text-4xl sm:text-5xl lg:text-6xl font-black">Presisi Ayat Realtime</span>
+          </h2>
+
+          <p class="text-sm lg:text-base text-slate-300 leading-relaxed max-w-xl">
+            Sistem cerdas AI yang menyimak bacaan hafalan Al-Qur'an melalui mikrofon laptop atau PC Anda, mencocokkan teks ayat secara kata per kata, menandai kekeliruan secara instan, dan merekam suara siswa untuk evaluasi guru.
+          </p>
+
+          <!-- Desktop CTA Buttons -->
+          <div class="flex flex-col sm:flex-row items-center gap-3.5 pt-2">
+            <button onclick="startDirectTasmi()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 hover:opacity-95 text-white font-extrabold text-sm shadow-xl shadow-blue-600/25 flex items-center justify-center space-x-2.5 transition transform hover:-translate-y-0.5">
+              <span class="text-xl">🎙️</span>
+              <span>Mulai Tasmi Sekarang</span>
+            </button>
+            
+            <button onclick="openLoginModal()" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 font-bold text-xs border border-slate-700/70 flex items-center justify-center space-x-2 transition">
+              <span>Panel Penguji / Guru</span>
+            </button>
+          </div>
+
+          <!-- Feature Highlights Tags -->
+          <div class="flex flex-wrap gap-2.5 pt-2">
+            <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs">✓ Juz 1–30 Lengkap</span>
+            <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs">✓ Auto-Advance Ayat</span>
+            <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs">✓ Simpan ke Google Sheets</span>
+            <span class="px-3 py-1 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-xs">✓ Audio HD Playback</span>
+          </div>
         </div>
 
-        <!-- LARGE TILTED ROUNDED HERO CARD WITH DOUBLE ACCENT OUTLINE -->
-        <div id="hero-card-wrap" class="relative w-full mt-6 px-2 py-4 transition-transform duration-300 ease-out">
-          <div class="accent-outline-layer"></div>
-          <div class="moving-border-box shadow-2xl shadow-emerald-500/10 transform rotate-1 hover:rotate-0 transition duration-500">
-            <div class="moving-border-inner bg-slate-900 p-4 text-left space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                <div class="flex items-center space-x-2">
-                  <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">AI Live Match: 98%</span>
-              </div>
+        <!-- Right Column: Large Tilted Rounded Card with Double Accent Outline (55%) -->
+        <div class="lg:col-span-6 relative">
+          <div id="hero-card-wrap" class="relative w-full transition-transform duration-300 ease-out">
+            <!-- Double Layer Accent Outline -->
+            <div class="accent-outline-layer"></div>
 
-              <!-- Preview Ayat Mockup -->
-              <div class="space-y-2">
-                <p class="text-xs text-slate-400 flex items-center justify-between">
-                  <span>QS. An-Naba' : Ayat 1</span>
-                  <span class="text-emerald-400 font-semibold">🟢 Sesuai</span>
-                </p>
-                <div class="ayah-text-ar text-white text-xl py-1 text-right">
-                  عَمَّ يَتَسَآءَلُونَ
+            <!-- Moving Border Light Box -->
+            <div class="moving-border-box shadow-2xl shadow-emerald-500/10 transform rotate-1 hover:rotate-0 transition duration-500">
+              <div class="moving-border-inner bg-slate-900 p-6 lg:p-8 text-left space-y-5">
+                
+                <!-- Browser mockup header -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-3.5 h-3.5 rounded-full bg-rose-500"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-amber-500"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-emerald-500"></div>
+                  </div>
+                  <span class="text-xs font-mono text-emerald-400 bg-emerald-950/70 px-3 py-1 rounded-lg border border-emerald-500/30">AI Live Speech Matcher: 98.8%</span>
                 </div>
-                <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                  <div class="bg-gradient-to-r from-blue-500 to-accent-emerald h-1.5 rounded-full" style="width: 85%"></div>
+
+                <!-- Preview Ayat Display -->
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span class="font-bold text-slate-300">QS. An-Naba' : Ayat 1</span>
+                    <span class="text-emerald-400 font-bold bg-emerald-950/50 px-2.5 py-0.5 rounded-md border border-emerald-500/30">🟢 Tuntas Terdeteksi</span>
+                  </div>
+
+                  <div class="ayah-text-ar text-white text-3xl lg:text-4xl py-2 px-2 text-right">
+                    عَمَّ يَتَسَآءَلُونَ
+                  </div>
+
+                  <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-400">Deteksi Suara Santri:</span>
+                      <span class="text-emerald-400 font-mono font-bold">100% Cocok</span>
+                    </div>
+                    <p class="text-xs font-mono text-emerald-300">"عم يتساءلون"</p>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div class="bg-gradient-to-r from-blue-500 via-accent-emerald to-accent-lime h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                  </div>
                 </div>
+
               </div>
             </div>
-          </div>
 
-          <!-- Floating Info Cards -->
-          <div class="absolute -bottom-2 -left-1 glass-card px-3 py-2 rounded-xl shadow-lg border border-emerald-500/30 flex items-center space-x-2">
-            <span class="text-base">⭐</span>
-            <div>
-              <p class="text-[10px] text-slate-400 leading-none">Akurasi Kata</p>
-              <p class="text-xs font-bold text-emerald-400">98.5% Presisi</p>
+            <!-- Floating Info Cards -->
+            <div class="absolute -bottom-4 -left-4 glass-card px-4 py-3 rounded-2xl shadow-2xl border border-emerald-500/40 flex items-center space-x-3">
+              <span class="text-2xl">⭐</span>
+              <div>
+                <p class="text-[11px] text-slate-400 leading-none">Akurasi Kata Per Kata</p>
+                <p class="text-sm font-extrabold text-emerald-400">98.5% Presisi Tinggi</p>
+              </div>
             </div>
-          </div>
 
-          <div class="absolute -top-2 -right-1 glass-card px-3 py-2 rounded-xl shadow-lg border border-blue-500/30 flex items-center space-x-2">
-            <span class="text-base">🎙️</span>
-            <div>
-              <p class="text-[10px] text-slate-400 leading-none">Auto Rekam</p>
-              <p class="text-xs font-bold text-blue-400">Audio HD</p>
+            <div class="absolute -top-4 -right-4 glass-card px-4 py-3 rounded-2xl shadow-2xl border border-blue-500/40 flex items-center space-x-3">
+              <span class="text-2xl">🎧</span>
+              <div>
+                <p class="text-[11px] text-slate-400 leading-none">Auto Rekam Sesi</p>
+                <p class="text-sm font-extrabold text-blue-400">HD Audio Playback</p>
+              </div>
             </div>
           </div>
         </div>
 
       </div>
 
-      <!-- FITUR UNGGULAN -->
-      <div class="space-y-3 pt-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Fitur Utama AI Pentasmi</h3>
+      <!-- FITUR UNGGULAN (DESKTOP 4-COLUMN GRID) -->
+      <div class="space-y-6 pt-6 border-t border-slate-800/80">
+        <div class="text-center space-y-1">
+          <h3 class="text-xs font-extrabold uppercase tracking-widest text-blue-400">Fitur Utama Platform</h3>
+          <h4 class="text-xl lg:text-2xl font-bold text-white">Teknologi Menyimak Hafalan Berbasis AI</h4>
+        </div>
         
-        <div class="grid grid-cols-2 gap-2.5">
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-1.5">
-            <div class="text-xl">🎯</div>
-            <h4 class="font-bold text-xs text-white">Deteksi Kata</h4>
-            <p class="text-[11px] text-slate-400">Menandai kata benar, keliru, dan terlewat secara otomatis.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3 hover:border-blue-500/40 transition">
+            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center text-2xl">🎯</div>
+            <h5 class="font-bold text-base text-white">Deteksi Kata Realtime</h5>
+            <p class="text-xs text-slate-400 leading-relaxed">Menyimak suara bacaan santri dan menandai kata benar, keliru, dan terlewat secara otomatis.</p>
           </div>
 
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-1.5">
-            <div class="text-xl">⚡</div>
-            <h4 class="font-bold text-xs text-white">Auto-Next Ayat</h4>
-            <p class="text-[11px] text-slate-400">Berpindah ayat otomatis saat bacaan siswa tuntas.</p>
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3 hover:border-emerald-500/40 transition">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-2xl">⚡</div>
+            <h5 class="font-bold text-base text-white">Auto-Next Ayat</h5>
+            <p class="text-xs text-slate-400 leading-relaxed">Sistem berpindah ayat secara otomatis begitu bacaan ayat santri tuntas terdeteksi.</p>
           </div>
 
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-1.5">
-            <div class="text-xl">🎧</div>
-            <h4 class="font-bold text-xs text-white">Audio Playback</h4>
-            <p class="text-[11px] text-slate-400">Rekaman suara tersimpan untuk verifikasi manual guru.</p>
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3 hover:border-purple-500/40 transition">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-2xl">🎧</div>
+            <h5 class="font-bold text-base text-white">Perekam & Pemutar Audio</h5>
+            <p class="text-xs text-slate-400 leading-relaxed">Merekam suara selama tasmi berlangsung untuk verifikasi manual tajwid dan makhraj oleh guru.</p>
           </div>
 
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-1.5">
-            <div class="text-xl">📊</div>
-            <h4 class="font-bold text-xs text-white">Laporan Nilai</h4>
-            <p class="text-[11px] text-slate-400">Kalkulasi skor 0-100 dan daftar kesalahan hafalan.</p>
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3 hover:border-amber-500/40 transition">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-2xl">📊</div>
+            <h5 class="font-bold text-base text-white">Laporan Nilai & Sinkronisasi</h5>
+            <p class="text-xs text-slate-400 leading-relaxed">Kalkulasi skor otomatis (0–100) dan tersinkronisasi langsung ke Google Spreadsheet lembaga.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 2: BERANDA DASHBOARD -->
-    <section id="view-home" class="space-y-5 hidden">
-      <div class="glass-card p-4 rounded-3xl border border-slate-800 relative overflow-hidden">
-        <div class="relative z-10 space-y-1">
-          <span class="text-[11px] font-semibold text-blue-400 tracking-wide uppercase">PENTASMI AL-QUR'AN</span>
-          <h2 class="text-lg font-extrabold text-white">Teman AI Menyimak Hafalan</h2>
-          <p class="text-xs text-slate-300">Siap menyimak dan merekam ujian hafalan hari ini?</p>
+    <!-- VIEW 2: BERANDA DASHBOARD (DESKTOP LAYOUT) -->
+    <section id="view-home" class="space-y-8 hidden">
+      
+      <!-- Banner Header -->
+      <div class="glass-card p-8 rounded-3xl border border-slate-800 relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="relative z-10 space-y-2 max-w-2xl">
+          <span class="text-xs font-bold text-blue-400 tracking-wider uppercase bg-blue-950/60 px-3 py-1 rounded-lg border border-blue-500/30">Dashboard Penguji</span>
+          <h2 class="text-2xl lg:text-3xl font-extrabold text-white">Selamat Datang di PENTASMI AL-QUR'AN AI</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">Siap memulai pengujian dan menyimak bacaan hafalan santri hari ini dengan AI speech recognition?</p>
         </div>
-        <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex-shrink-0">
+          <button onclick="switchTab('tasmi')" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 hover:opacity-95 text-white font-extrabold text-sm shadow-xl shadow-blue-600/30 flex items-center space-x-2.5 transition active:scale-95">
+            <span class="text-xl">🎙️</span>
+            <span>Mulai Sesi Tasmi Baru</span>
+          </button>
+        </div>
+        
+        <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
       </div>
 
-      <!-- Quick Metrics Grid -->
-      <div class="grid grid-cols-2 gap-2.5">
-        <div class="glass-card p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center text-lg">
+      <!-- Quick Metrics Grid (4 Columns Desktop) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="glass-card p-5 rounded-3xl border border-slate-800 flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center text-2xl">
             📑
           </div>
           <div>
-            <p class="text-[10px] text-slate-400 font-medium">Total Tasmi</p>
-            <p id="metricTotal" class="text-base font-extrabold text-white">0</p>
+            <p class="text-xs text-slate-400 font-medium">Total Sesi Tasmi</p>
+            <p id="metricTotal" class="text-2xl font-black text-white">0</p>
           </div>
         </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-emerald-500/20 flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg">
+        <div class="glass-card p-5 rounded-3xl border border-emerald-500/20 flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-2xl">
             ✅
           </div>
           <div>
-            <p class="text-[10px] text-slate-400 font-medium">Selesai</p>
-            <p id="metricCompleted" class="text-base font-extrabold text-white">0</p>
+            <p class="text-xs text-slate-400 font-medium">Tasmi Selesai</p>
+            <p id="metricCompleted" class="text-2xl font-black text-white">0</p>
           </div>
         </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-lg">
+        <div class="glass-card p-5 rounded-3xl border border-amber-500/20 flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-2xl">
             ⭐
           </div>
           <div>
-            <p class="text-[10px] text-slate-400 font-medium">Rata-rata Nilai</p>
-            <p id="metricAvgScore" class="text-base font-extrabold text-white">0%</p>
+            <p class="text-xs text-slate-400 font-medium">Rata-rata Nilai</p>
+            <p id="metricAvgScore" class="text-2xl font-black text-white">0%</p>
           </div>
         </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-purple-500/20 flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-lg">
+        <div class="glass-card p-5 rounded-3xl border border-purple-500/20 flex items-center space-x-4">
+          <div class="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-2xl">
             🕒
           </div>
           <div>
-            <p class="text-[10px] text-slate-400 font-medium">Terakhir</p>
-            <p id="metricLast" class="text-xs font-bold text-white truncate max-w-[85px]">-</p>
+            <p class="text-xs text-slate-400 font-medium">Tasmi Terakhir</p>
+            <p id="metricLast" class="text-sm font-bold text-white truncate max-w-[140px]">-</p>
           </div>
         </div>
       </div>
 
-      <!-- MAIN CTA BUTTON -->
-      <button onclick="switchTab('tasmi')" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white font-bold text-base shadow-xl shadow-blue-600/30 flex items-center justify-center space-x-2 transition active:scale-95">
-        <span class="text-xl">🎙️</span>
-        <span>Mulai Tasmi</span>
-      </button>
-
-      <!-- Recent Tasmi Activity -->
-      <div class="space-y-2.5">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Tasmi Terkini</h3>
-          <button onclick="switchTab('history')" class="text-xs text-blue-400 hover:underline">Lihat Semua</button>
+      <!-- Recent Tasmi Activity (Desktop Grid / Table View) -->
+      <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+              <span>📑</span> Riwayat Aktivitas Tasmi Terkini
+            </h3>
+            <p class="text-xs text-slate-400">Data ujian santri yang baru disimak dan dinilai</p>
+          </div>
+          <button onclick="switchTab('history')" class="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline">
+            Lihat Semua Riwayat →
+          </button>
         </div>
 
-        <div id="homeRecentList" class="space-y-2">
-          <div class="p-4 text-center text-xs text-slate-500 glass-card rounded-2xl">
+        <div id="homeRecentList" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div class="col-span-full p-8 text-center text-xs text-slate-500 glass-card rounded-2xl">
             Belum ada data tasmi tersimpan.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 3: HALAMAN TASMI (SETUP + LIVE + RESULT) -->
-    <section id="view-tasmi" class="space-y-4 hidden">
+    <!-- VIEW 3: HALAMAN TASMI (DESKTOP WORKFLOW & LIVE SCREEN) -->
+    <section id="view-tasmi" class="space-y-6 hidden">
       
-      <!-- SUB-STEP 1: SETUP TARGET HAFALAN -->
-      <div id="tasmi-step-setup" class="space-y-4">
+      <!-- SUB-STEP 1: SETUP TARGET HAFALAN (DESKTOP 2-COLUMN FORM) -->
+      <div id="tasmi-step-setup" class="space-y-6">
         <div class="text-center space-y-1">
-          <h2 class="text-lg font-bold text-white">Tentukan Target Hafalan</h2>
-          <p class="text-xs text-slate-400">Pilih Juz, Surat, dan rentang ayat yang akan disimak</p>
+          <h2 class="text-2xl font-extrabold text-white">Tentukan Target Ujian Hafalan</h2>
+          <p class="text-sm text-slate-400">Pilih data santri, Juz, Surat, dan rentang ayat yang akan diuji</p>
         </div>
 
-        <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3.5">
-          <div>
-            <label class="block text-xs font-medium text-slate-300 mb-1">Nama Siswa / Peserta</label>
-            <input id="inputStudentName" type="text" placeholder="Contoh: Muhammad Fatih" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div>
-            <label class="block text-xs font-medium text-slate-300 mb-1">Juz</label>
-            <select id="selectJuz" onchange="onJuzChange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-medium text-slate-300 mb-1">Surat</label>
-            <select id="selectSurah" onchange="onSurahChange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
-            </select>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Form Configurator (Left 7 Cols) -->
+          <div class="lg:col-span-7 glass-card p-6 lg:p-8 rounded-3xl border border-slate-800 space-y-5">
             <div>
-              <label class="block text-xs font-medium text-slate-300 mb-1">Ayat Mulai</label>
-              <input id="inputAyahStart" type="number" min="1" value="1" onchange="validateAyahRange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
+              <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Nama Santri / Peserta Ujian</label>
+              <input id="inputStudentName" type="text" placeholder="Contoh: Muhammad Fatih" class="w-full px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500 transition">
             </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-300 mb-1">Ayat Akhir</label>
-              <input id="inputAyahEnd" type="number" min="1" value="10" onchange="validateAyahRange()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Pilih Juz</label>
+                <select id="selectJuz" onchange="onJuzChange()" class="w-full px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Pilih Surat</label>
+                <select id="selectSurah" onchange="onSurahChange()" class="w-full px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Ayat Mulai</label>
+                <input id="inputAyahStart" type="number" min="1" value="1" onchange="validateAyahRange()" class="w-full px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Ayat Akhir</label>
+                <input id="inputAyahEnd" type="number" min="1" value="10" onchange="validateAyahRange()" class="w-full px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-blue-500/30 bg-blue-950/20 text-center space-y-1">
-          <p class="text-[11px] text-blue-300 font-medium">Ringkasan Ujian:</p>
-          <p id="targetSummaryText" class="text-sm font-extrabold text-white">Juz 30 — QS. An-Naba' (Ayat 1–10)</p>
-        </div>
+          <!-- Summary & Start Button (Right 5 Cols) -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="glass-card p-6 lg:p-8 rounded-3xl border border-blue-500/30 bg-blue-950/20 space-y-4">
+              <div class="flex items-center space-x-2 text-blue-400 font-bold text-xs uppercase tracking-wider">
+                <span>📋</span>
+                <span>Ringkasan Target Ujian</span>
+              </div>
 
-        <button id="btnStartLiveSession" onclick="startLiveTasmiSession()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white font-extrabold text-base shadow-xl shadow-blue-600/30 flex items-center justify-center space-x-2 transition active:scale-95">
-          <span class="text-xl">🎙️</span>
-          <span>Mulai Menyimak & Buka Mic</span>
-        </button>
+              <div class="space-y-1">
+                <p class="text-xs text-slate-400">Target Surat & Rentang Ayat:</p>
+                <p id="targetSummaryText" class="text-xl font-extrabold text-white">Juz 30 — QS. An-Naba' (Ayat 1–10)</p>
+              </div>
+
+              <div class="border-t border-slate-800 pt-3 space-y-2 text-xs text-slate-300">
+                <div class="flex items-center justify-between">
+                  <span>Mikrofon:</span>
+                  <span class="text-emerald-400 font-bold">Siap Digunakan 🎙️</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Evaluasi AI:</span>
+                  <span class="text-blue-400 font-bold">Realtime Kata Per Kata</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Perekam Suara:</span>
+                  <span class="text-purple-400 font-bold">Otomatis HD Recording</span>
+                </div>
+              </div>
+
+              <button id="btnStartLiveSession" onclick="startLiveTasmiSession()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white font-black text-base shadow-xl shadow-blue-600/30 flex items-center justify-center space-x-2.5 transition transform hover:-translate-y-0.5 active:scale-95">
+                <span class="text-xl">🎙️</span>
+                <span>Mulai Menyimak & Buka Mic</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <!-- SUB-STEP 2: LIVE TASMI SESSION -->
-      <div id="tasmi-step-live" class="space-y-3.5 hidden">
+      <!-- SUB-STEP 2: LIVE TASMI SESSION (DESKTOP WIDE FOCAL DISPLAY) -->
+      <div id="tasmi-step-live" class="space-y-5 hidden">
         
-        <!-- Live HUD -->
-        <div class="glass-card p-3 rounded-2xl border border-slate-800 grid grid-cols-4 gap-2 text-center">
-          <div>
-            <p class="text-[10px] text-slate-400">Durasi</p>
-            <p id="liveDuration" class="text-xs font-bold text-white font-mono">00:00</p>
+        <!-- Live Desktop HUD Metrics Bar -->
+        <div class="glass-card p-4 lg:p-5 rounded-3xl border border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div class="p-2 rounded-2xl bg-slate-900/60 border border-slate-800">
+            <p class="text-xs text-slate-400 font-medium">Durasi Ujian</p>
+            <p id="liveDuration" class="text-xl font-black text-white font-mono mt-0.5">00:00</p>
           </div>
-          <div>
-            <p class="text-[10px] text-slate-400">Progress</p>
-            <p id="liveProgress" class="text-xs font-bold text-blue-400">1 / 10</p>
+          <div class="p-2 rounded-2xl bg-slate-900/60 border border-slate-800">
+            <p class="text-xs text-slate-400 font-medium">Progress Ayat</p>
+            <p id="liveProgress" class="text-xl font-black text-blue-400 mt-0.5">1 / 10</p>
           </div>
-          <div>
-            <p class="text-[10px] text-slate-400">Kecocokan</p>
-            <p id="liveAccuracy" class="text-xs font-bold text-emerald-400">100%</p>
+          <div class="p-2 rounded-2xl bg-slate-900/60 border border-slate-800">
+            <p class="text-xs text-slate-400 font-medium">Akurasi Kecocokan</p>
+            <p id="liveAccuracy" class="text-xl font-black text-emerald-400 mt-0.5">100%</p>
           </div>
-          <div>
-            <p class="text-[10px] text-slate-400">Kesalahan</p>
-            <p id="liveErrors" class="text-xs font-bold text-rose-400">0</p>
+          <div class="p-2 rounded-2xl bg-slate-900/60 border border-slate-800">
+            <p class="text-xs text-slate-400 font-medium">Jumlah Kesalahan</p>
+            <p id="liveErrors" class="text-xl font-black text-rose-400 mt-0.5">0</p>
           </div>
         </div>
 
-        <!-- Mobile Mic Status Alert & Live Wave Indicator -->
-        <div class="glass-card p-2.5 rounded-2xl border border-blue-500/30 space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <div class="flex items-center space-x-2">
-              <span id="mobileMicPulseDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="mobileMicStatusText" class="text-slate-200 text-[11px] font-semibold">Mikrofon HP Mendengar...</span>
-            </div>
-            
-            <div id="liveAudioWaveContainer" class="flex items-center space-x-1 h-4 px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800" title="Deteksi Gelombang Suara">
-              <span class="wave-bar w-1 bg-emerald-400 rounded-full h-2"></span>
-              <span class="wave-bar w-1 bg-emerald-400 rounded-full h-3"></span>
-              <span class="wave-bar w-1 bg-emerald-400 rounded-full h-1"></span>
-              <span class="wave-bar w-1 bg-emerald-400 rounded-full h-4"></span>
-              <span class="wave-bar w-1 bg-emerald-400 rounded-full h-2"></span>
+        <!-- Desktop Mic Controls & Status Toolbar -->
+        <div class="glass-card p-4 rounded-2xl border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <span id="mobileMicPulseDot" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div>
+              <p id="mobileMicStatusText" class="text-sm font-bold text-white">Mikrofon Mendengarkan Suara Santri...</p>
+              <p class="text-[11px] text-slate-400">Bacalah ayat secara tartil dan jelas</p>
             </div>
           </div>
 
-          <!-- Language Engine Toggle & Simulation Tool -->
-          <div class="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-            <span class="text-slate-400">Mode Suara:</span>
-            <div class="flex items-center space-x-1.5">
-              <button id="btnLangArabic" onclick="switchSpeechLang('ar-SA')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-bold border border-emerald-400/40 transition">
-                🇸🇦 Arab
+          <!-- Waveform Visualizer & Engine Options -->
+          <div class="flex items-center space-x-4">
+            <!-- Audio Waveform -->
+            <div id="liveAudioWaveContainer" class="flex items-center space-x-1.5 h-6 px-3 py-1 rounded-xl bg-slate-900 border border-slate-800" title="Deteksi Gelombang Suara">
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-2"></span>
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-4"></span>
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-1.5"></span>
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-5"></span>
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-3"></span>
+              <span class="wave-bar w-1.5 bg-emerald-400 rounded-full h-2"></span>
+            </div>
+
+            <!-- Speech Mode Toggles -->
+            <div class="flex items-center space-x-2">
+              <button id="btnLangArabic" onclick="switchSpeechLang('ar-SA')" class="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs border border-emerald-400/40 transition">
+                🇸🇦 Bahasa Arab
               </button>
-              <button id="btnLangIndo" onclick="switchSpeechLang('id-ID')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold border border-slate-700 hover:text-white transition">
-                🇮🇩 Latin
+              <button id="btnLangIndo" onclick="switchSpeechLang('id-ID')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700 hover:text-white transition">
+                🇮🇩 Fonetik Latin
               </button>
-              <button onclick="simulateVoiceRecognition()" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 hover:bg-amber-500/30 transition" title="Simulasi Suara Santri untuk Tes Cepat">
+              <button onclick="simulateVoiceRecognition()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/40 hover:bg-amber-500/30 transition" title="Simulasi Suara untuk Pengujian Cepat">
                 ⚡ Tes Baca
               </button>
-              <button onclick="restartMobileSpeechRecognition()" class="px-2 py-0.5 rounded-lg bg-blue-600/30 text-blue-300 font-semibold border border-blue-400/30" title="Segarkan Mic">
+              <button onclick="restartMobileSpeechRecognition()" class="p-2 rounded-xl bg-blue-600/30 text-blue-300 text-xs font-semibold border border-blue-400/30" title="Segarkan Mic">
                 🔄
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Status Indikator Legend & Interactive Hint -->
-        <div class="flex items-center justify-between px-1 text-[10px] text-slate-400">
-          <div class="flex items-center space-x-2">
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Benar</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Dibaca</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Salah</span>
-          </div>
-          <span class="text-emerald-400 font-medium">✨ Otomatis Deteksi AI</span>
-        </div>
-
-        <!-- CURRENT AYAT DISPLAY (FOCAL CARD) -->
-        <div class="glass-card p-4 rounded-3xl border-2 border-blue-500/80 shadow-xl shadow-blue-500/10 space-y-3 relative overflow-hidden transition-all duration-300">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div class="flex items-center space-x-1.5">
-              <span id="liveCurrentAyahLabel" class="text-xs font-bold text-amber-400 bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-500/30">
+        <!-- MAIN FOCAL AYAT DISPLAY CARD (DESKTOP WIDE) -->
+        <div class="glass-card p-6 lg:p-8 rounded-3xl border-2 border-blue-500/70 shadow-2xl shadow-blue-500/10 space-y-6">
+          
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-3">
+              <span id="liveCurrentAyahLabel" class="text-sm font-bold text-amber-400 bg-amber-950/60 px-3.5 py-1.5 rounded-xl border border-amber-500/40">
                 🟡 Ayat 1 Sedang Dibaca
               </span>
-              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Auto AI
+              <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Auto-Advance AI Aktif
               </span>
             </div>
-            <span id="liveMicBadge" class="text-[11px] flex items-center gap-1 text-emerald-400">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Mendengar
-            </span>
+            
+            <div class="flex items-center space-x-3 text-xs text-slate-400">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Benar</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span> Dibaca</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Salah</span>
+            </div>
           </div>
 
-          <!-- Teks Ayat Arab dengan Live Word Highlighting & Interactive Touch Support -->
-          <div id="liveArabicText" class="ayah-text-ar text-white text-2xl py-2 px-1 min-h-[90px] flex items-center justify-end flex-wrap gap-2 transition-all">
+          <!-- Teks Ayat Arab (Large Desktop Size) -->
+          <div id="liveArabicText" class="ayah-text-ar text-white text-3xl lg:text-5xl py-4 px-2 min-h-[120px] flex items-center justify-end flex-wrap gap-3.5 transition-all">
             بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
           </div>
 
-          <!-- Indikator Kata Terdeteksi -->
-          <div id="liveWordTracker" class="flex flex-wrap gap-1.5 justify-end pt-1">
+          <!-- Word Tracker Chips -->
+          <div id="liveWordTracker" class="flex flex-wrap gap-2 justify-end pt-2 border-t border-slate-800/80">
           </div>
 
-          <!-- Terjemahan / Transliterasi -->
-          <p id="liveTranslationText" class="text-xs text-slate-300 italic text-left pt-1 border-t border-slate-800/80">
+          <!-- Transliterasi & Terjemahan -->
+          <p id="liveTranslationText" class="text-sm text-slate-300 italic text-left pt-2">
             Memuat ayat...
           </p>
 
-          <!-- Live Transcript AI yang Terdeteksi Suara Siswa & Auto Progress Bar -->
-          <div class="bg-slate-900/90 rounded-xl p-2.5 border border-slate-800 space-y-1.5">
-            <div class="flex items-center justify-between text-[10px] text-slate-400">
-              <span class="flex items-center gap-1">
-                <span>🎙️ Suara Siswa Terdeteksi:</span>
+          <!-- Live Transcript AI Box -->
+          <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="flex items-center gap-2">
+                <span>🎙️ Suara Santri Terdeteksi (Realtime):</span>
                 <span id="autoAdvanceCountdown" class="text-emerald-400 font-bold hidden">⏳ Auto-Lanjut...</span>
               </span>
-              <span id="liveMatchBadge" class="text-emerald-400 font-bold">Kecocokan: 0%</span>
+              <span id="liveMatchBadge" class="text-emerald-400 font-extrabold text-sm">Kecocokan: 0%</span>
             </div>
-            <p id="liveTranscriptText" class="text-xs text-emerald-300 font-mono italic min-h-[20px]">
+            <p id="liveTranscriptText" class="text-sm text-emerald-300 font-mono italic min-h-[24px]">
               "Mendengarkan bacaan hafalan..."
             </p>
-            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-              <div id="liveMatchMeter" class="bg-gradient-to-r from-amber-500 via-emerald-400 to-accent-emerald h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div id="liveMatchMeter" class="bg-gradient-to-r from-amber-500 via-emerald-400 to-accent-emerald h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
+
         </div>
 
-        <!-- Manual Controls (Opsional Override Guru / Siswa) -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="markCurrentAyah(false, 'Koreksi manual oleh penguji')" class="py-2.5 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 font-semibold text-xs border border-rose-600/30 flex items-center justify-center space-x-1.5 transition">
-            <span>❌ Manual Salah</span>
-          </button>
-          <button onclick="markCurrentAyah(true)" class="py-2.5 px-3 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 font-semibold text-xs border border-emerald-600/30 flex items-center justify-center space-x-1.5 transition">
-            <span>⏩ Lewati / Lanjut</span>
+        <!-- Manual Override & Selesaikan Session (Desktop Actions) -->
+        <div class="flex items-center justify-between gap-4 pt-2">
+          <div class="flex items-center space-x-3">
+            <button onclick="markCurrentAyah(false, 'Koreksi manual oleh penguji')" class="px-5 py-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 font-bold text-xs border border-rose-600/30 flex items-center space-x-2 transition">
+              <span>❌ Tandai Salah</span>
+            </button>
+            <button onclick="markCurrentAyah(true)" class="px-5 py-3 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 font-bold text-xs border border-emerald-600/30 flex items-center space-x-2 transition">
+              <span>⏩ Lewati / Lanjut</span>
+            </button>
+          </div>
+
+          <button onclick="finishTasmiSession()" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs border border-slate-700 flex items-center space-x-2 transition">
+            <span>⏹️ Selesaikan Sesi Ujian</span>
           </button>
         </div>
-
-        <!-- Selesaikan Tasmi Button -->
-        <button onclick="finishTasmiSession()" class="w-full py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center justify-center space-x-2 transition">
-          <span>⏹️ Selesaikan Sesi Tasmi</span>
-        </button>
       </div>
 
-      <!-- SUB-STEP 3: HASIL & EVALUASI TASMI -->
-      <div id="tasmi-step-result" class="space-y-4 hidden">
+      <!-- SUB-STEP 3: HASIL & EVALUASI TASMI (DESKTOP RESULTS VIEW) -->
+      <div id="tasmi-step-result" class="space-y-6 hidden">
         <div class="text-center space-y-1">
-          <div class="inline-block text-3xl">🎉</div>
-          <h2 class="text-xl font-extrabold text-white">Tasmi Selesai!</h2>
-          <p class="text-xs text-slate-400">Evaluasi dan hasil akurasi bacaan hafalan</p>
+          <div class="inline-block text-4xl">🎉</div>
+          <h2 class="text-2xl lg:text-3xl font-black text-white">Sesi Tasmi Selesai!</h2>
+          <p class="text-sm text-slate-400">Hasil penilaian akurasi hafalan dan rekaman audio santri</p>
         </div>
 
-        <!-- Score Card -->
-        <div class="glass-card p-5 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950/30 text-center space-y-3">
-          <div>
-            <p class="text-xs text-slate-400 uppercase font-medium">Nilai Akhir</p>
-            <p id="resultScore" class="text-5xl font-extrabold text-gradient-green my-1">92</p>
-            <p id="resultStatusText" class="text-xs font-semibold text-emerald-400">⭐ Sangat Baik (Mumtaz)</p>
-          </div>
-
-          <!-- Rincian Metrics -->
-          <div class="grid grid-cols-3 gap-2 border-t border-slate-800 pt-3 text-center">
+        <!-- Score & Metrics Summary Card -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div class="lg:col-span-4 glass-card p-6 lg:p-8 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950/30 text-center space-y-4">
             <div>
-              <p class="text-[10px] text-slate-400">Total Ayat</p>
-              <p id="resTotalAyah" class="text-xs font-bold text-white">10</p>
+              <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Nilai Akhir Ujian</p>
+              <p id="resultScore" class="text-6xl font-black text-gradient-green my-2">92</p>
+              <p id="resultStatusText" class="text-sm font-bold text-emerald-400">⭐ Sangat Baik (Mumtaz)</p>
             </div>
-            <div>
-              <p class="text-[10px] text-slate-400">Ayat Benar</p>
-              <p id="resCorrectAyah" class="text-xs font-bold text-emerald-400">9</p>
-            </div>
-            <div>
-              <p class="text-[10px] text-slate-400">Kesalahan</p>
-              <p id="resErrorCount" class="text-xs font-bold text-rose-400">1</p>
+
+            <div class="grid grid-cols-3 gap-2 border-t border-slate-800 pt-4 text-center">
+              <div>
+                <p class="text-[11px] text-slate-400">Total Ayat</p>
+                <p id="resTotalAyah" class="text-sm font-extrabold text-white">10</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400">Ayat Benar</p>
+                <p id="resCorrectAyah" class="text-sm font-extrabold text-emerald-400">9</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400">Kesalahan</p>
+                <p id="resErrorCount" class="text-sm font-extrabold text-rose-400">1</p>
+              </div>
             </div>
           </div>
+
+          <div class="lg:col-span-8 space-y-6">
+            <!-- Audio Player Card -->
+            <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                  <span>🎧</span> Rekaman Audio Sesi Ujian (HD)
+                </h3>
+                <span id="audioDurationText" class="text-xs font-mono text-slate-400 font-bold">00:00</span>
+              </div>
+
+              <audio id="recordedAudioPlayer" class="w-full h-11 rounded-xl outline-none bg-slate-900" controls preload="auto"></audio>
+
+              <div class="flex items-center justify-between pt-1">
+                <p class="text-xs text-slate-400">Dengarkan kembali rekaman santri untuk verifikasi makhraj & tajwid.</p>
+                <a id="downloadAudioBtn" href="#" download="tasmi-recording.webm" class="px-4 py-2 rounded-xl bg-blue-600/30 text-blue-400 hover:bg-blue-600 hover:text-white text-xs font-bold border border-blue-500/40 transition">
+                  💾 Unduh Rekaman
+                </a>
+              </div>
+            </div>
+
+            <!-- List of Mistakes -->
+            <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span class="text-rose-400">❌</span> Daftar Catatan & Kesalahan Hafalan
+              </h3>
+              <div id="resultErrorList" class="space-y-2.5 max-h-48 overflow-y-auto">
+                <p class="text-xs text-emerald-400 italic">Alhamdulillah, tidak ada kesalahan tercatat!</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- AUDIO PLAYER REKAMAN TASMI -->
-        <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-              <span>🎧</span> Rekaman Suara Sesi Tasmi
-            </h3>
-            <span id="audioDurationText" class="text-[11px] font-mono text-slate-400">00:00</span>
-          </div>
-
-          <audio id="recordedAudioPlayer" class="w-full h-10 rounded-lg outline-none bg-slate-900" controls preload="auto"></audio>
-
-          <div class="flex items-center justify-between pt-1">
-            <p class="text-[10px] text-slate-400">Dengarkan kembali untuk verifikasi tajwid & hafalan.</p>
-            <a id="downloadAudioBtn" href="#" download="tasmi-recording.webm" class="px-3 py-1.5 rounded-lg bg-blue-600/30 text-blue-400 hover:bg-blue-600 hover:text-white text-xs font-semibold border border-blue-500/40 transition">
-              💾 Unduh
-            </a>
-          </div>
-        </div>
-
-        <!-- DAFTAR KESALAHAN -->
-        <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-2.5">
-          <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-            <span class="text-rose-400">❌</span> Daftar Catatan / Kesalahan
-          </h3>
-          <div id="resultErrorList" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
-            <p class="text-xs text-emerald-400 italic">Alhamdulillah, tidak ada kesalahan tercatat!</p>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col space-y-2 pt-2">
-          <button onclick="resetToNewTasmi()" class="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-2 transition">
-            <span>🎙️ Mulai Tasmi Baru</span>
+        <!-- Action CTAs -->
+        <div class="flex items-center justify-center space-x-4 pt-4">
+          <button onclick="resetToNewTasmi()" class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm shadow-xl shadow-blue-600/30 flex items-center space-x-2 transition">
+            <span>🎙️ Mulai Sesi Tasmi Baru</span>
           </button>
-          <button onclick="switchTab('history')" class="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700 transition">
-            <span>Lihat di Riwayat</span>
+          <button onclick="switchTab('history')" class="px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-700 transition">
+            <span>Lihat Semua Riwayat</span>
           </button>
         </div>
       </div>
 
     </section>
 
-    <!-- VIEW 4: RIWAYAT TASMI -->
-    <section id="view-history" class="space-y-4 hidden">
-      <div class="flex items-center justify-between">
+    <!-- VIEW 4: RIWAYAT TASMI (DESKTOP TABLE & SEARCH VIEW) -->
+    <section id="view-history" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 class="text-lg font-bold text-white">Riwayat Tasmi</h2>
-          <p class="text-xs text-slate-400">Daftar sesi hafalan yang telah disimak</p>
+          <h2 class="text-2xl font-extrabold text-white">Riwayat Sesi Tasmi</h2>
+          <p class="text-xs text-slate-400">Daftar rekapan hasil ujian hafalan santri yang telah disimak</p>
         </div>
-        <button onclick="loadHistoryData()" class="p-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs transition">
-          🔄 Refresh
+        <button onclick="loadHistoryData()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-bold transition flex items-center space-x-1.5 self-start">
+          <span>🔄</span>
+          <span>Segarkan Data</span>
         </button>
       </div>
 
-      <!-- Search Input -->
-      <div>
-        <input id="historySearchInput" type="text" oninput="filterHistory()" placeholder="Cari surat atau nama siswa..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500">
+      <!-- Search & Filter Bar -->
+      <div class="glass-card p-4 rounded-2xl border border-slate-800">
+        <input id="historySearchInput" type="text" oninput="filterHistory()" placeholder="Cari nama santri, surat, atau juz..." class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500">
       </div>
 
-      <!-- History List -->
-      <div id="historyListContainer" class="space-y-2.5">
-        <div class="p-6 text-center text-xs text-slate-500 glass-card rounded-2xl">
+      <!-- History Cards Grid -->
+      <div id="historyListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="col-span-full p-12 text-center text-xs text-slate-500 glass-card rounded-3xl">
           Memuat riwayat...
         </div>
       </div>
     </section>
 
-    <!-- VIEW 5: PENGATURAN & ADMIN PANEL -->
-    <section id="view-settings" class="space-y-4 hidden">
+    <!-- VIEW 5: PENGATURAN & ADMIN PANEL (DESKTOP 2-COLUMN SETTINGS) -->
+    <section id="view-settings" class="space-y-6 hidden">
       <div>
-        <h2 class="text-lg font-bold text-white">Pengaturan</h2>
-        <p class="text-xs text-slate-400">Kelola preferensi, backend GAS, dan profil aplikasi</p>
+        <h2 class="text-2xl font-extrabold text-white">Pengaturan Sistem</h2>
+        <p class="text-xs text-slate-400">Kelola preferensi antarmuka, sinkronisasi Google Apps Script, dan profil lembaga</p>
       </div>
 
-      <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
-        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Tampilan & Mikrofon</h3>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         
-        <div class="flex items-center justify-between py-1">
-          <div>
-            <p class="text-xs font-semibold text-white">Tema Tampilan</p>
-            <p class="text-[10px] text-slate-400">Pilih antara mode Gelap dan Terang</p>
+        <!-- Left Settings Column -->
+        <div class="space-y-6">
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">Tampilan & Izin Perangkat</h3>
+            
+            <div class="flex items-center justify-between py-1">
+              <div>
+                <p class="text-xs font-bold text-white">Tema Antarmuka</p>
+                <p class="text-[11px] text-slate-400">Pilih antara Dark Mode dan Light Mode</p>
+              </div>
+              <button onclick="toggleTheme()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
+                ☀️ / 🌙 Ganti Tema
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between py-1 border-t border-slate-800 pt-3">
+              <div>
+                <p class="text-xs font-bold text-white">Status Izin Mikrofon</p>
+                <p id="micPermissionStatusText" class="text-[11px] text-emerald-400 font-semibold">Tersedia & Siap Digunakan</p>
+              </div>
+              <button onclick="requestMicrophoneAccess()" class="px-4 py-1.5 rounded-xl bg-blue-600/30 text-blue-400 text-xs font-bold border border-blue-500/30 hover:bg-blue-600 hover:text-white transition">
+                Tes Mic 🎙️
+              </button>
+            </div>
           </div>
-          <button onclick="toggleTheme()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-700">
-            ☀️ / 🌙 Ganti
-          </button>
-        </div>
 
-        <div class="flex items-center justify-between py-1 border-t border-slate-800">
-          <div>
-            <p class="text-xs font-semibold text-white">Status Izin Mikrofon</p>
-            <p id="micPermissionStatusText" class="text-[10px] text-emerald-400">Tersedia & Siap Digunakan</p>
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">Backend Google Apps Script</h3>
+            <div>
+              <label class="block text-xs text-slate-300 mb-1.5 font-medium">URL Endpoint Web App GAS</label>
+              <input id="settingGasUrl" type="text" value="https://script.google.com/macros/s/AKfycbxUst7L0QoT-DL-dp4qFZ56QZKSic3aKsoI3IWr5FFpHzdNAIg2K-jHxbnNjikeDjUn/exec" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-emerald-400 font-mono focus:outline-none">
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Seluruh data hasil tasmi otomatis disinkronkan ke Spreadsheet Anda melalui endpoint di atas.</p>
           </div>
-          <button onclick="requestMicrophoneAccess()" class="px-3 py-1 rounded-xl bg-blue-600/30 text-blue-400 text-xs font-semibold border border-blue-500/30">
-            Tes Mic 🎙️
-          </button>
-        </div>
-      </div>
-
-      <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
-        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Backend Google Apps Script</h3>
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">URL Endpoint Web App GAS</label>
-          <input id="settingGasUrl" type="text" value="https://script.google.com/macros/s/AKfycbxUst7L0QoT-DL-dp4qFZ56QZKSic3aKsoI3IWr5FFpHzdNAIg2K-jHxbnNjikeDjUn/exec" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-[11px] text-emerald-400 font-mono focus:outline-none">
-        </div>
-        <p class="text-[10px] text-slate-400 leading-relaxed">Data tasmi dan riwayat otomatis disinkronkan ke Spreadsheet Anda melalui endpoint di atas.</p>
-      </div>
-
-      <div class="glass-card p-4 rounded-3xl border border-slate-800 space-y-3">
-        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Pengaturan Lembaga & Footer</h3>
-
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">Nama Lembaga / Brand</label>
-          <input id="settingBrandName" type="text" value="Pentasmi Al-Qur'an AI" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
         </div>
 
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">Deskripsi Footer</label>
-          <textarea id="settingFooterDesc" rows="2" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">Aplikasi cerdas pendamping guru dan siswa dalam menyimak hafalan Al-Qur'an dengan teknologi AI.</textarea>
+        <!-- Right Settings Column -->
+        <div class="space-y-6">
+          <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">Pengaturan Lembaga & Footer</h3>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-medium">Nama Lembaga / Brand</label>
+              <input id="settingBrandName" type="text" value="Pentasmi Al-Qur'an AI" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1 font-medium">Deskripsi Footer</label>
+              <textarea id="settingFooterDesc" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">Platform cerdas pendamping guru dan santri dalam menyimak hafalan Al-Qur'an dengan teknologi AI Speech Recognition.</textarea>
+            </div>
+
+            <button onclick="saveAdminSettings()" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition">
+              Simpan Pengaturan
+            </button>
+          </div>
+
+          <div id="settingsSessionBlock" class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3">
+            <p class="text-xs text-slate-400">Masuk sebagai: <span id="settingsUserRole" class="font-bold text-white">Penguji / Guru</span></p>
+            <button onclick="handleLogout()" class="w-full py-3 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs border border-rose-700/50 transition">
+              Keluar (Logout)
+            </button>
+          </div>
         </div>
 
-        <button onclick="saveAdminSettings()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition">
-          Simpan Pengaturan
-        </button>
-      </div>
-
-      <div id="settingsSessionBlock" class="glass-card p-4 rounded-3xl border border-slate-800 space-y-2">
-        <p class="text-xs text-slate-400">Masuk sebagai: <span id="settingsUserRole" class="font-bold text-white">Penguji / Guru</span></p>
-        <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-semibold text-xs border border-rose-700/50 transition">
-          Keluar (Logout)
-        </button>
       </div>
     </section>
 
-    <!-- FOOTER INFORMASI -->
-    <footer id="appFooter" class="mt-8 pt-6 pb-4 border-t border-slate-800/80 text-center space-y-2 text-xs text-slate-400">
-      <div class="flex items-center justify-center space-x-2">
-        <span class="text-lg">📖</span>
-        <span id="footerBrandTitle" class="font-bold text-white">PENTASMI AL-QUR'AN</span>
-      </div>
-      <p id="footerBrandDesc" class="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
-        Teman AI untuk menyimak hafalan Al-Qur'an secara realtime.
-      </p>
-      <p id="footerCopyright" class="text-[10px] text-slate-500 pt-1">
-        © 2026 Pentasmi Al-Qur'an. Developed by SamaDigi.
-      </p>
-    </footer>
-
   </main>
 
-  <!-- BOTTOM NAVIGATION BAR (STICKY MOBILE) -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-800/90 py-2 px-6 max-w-md mx-auto flex items-center justify-between">
-    <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center space-y-1 text-blue-500 transition">
-      <span class="text-xl">🏠</span>
-      <span class="text-[10px] font-bold">Beranda</span>
-    </button>
-    <button onclick="switchTab('tasmi')" id="nav-btn-tasmi" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
-      <span class="text-xl">📖</span>
-      <span class="text-[10px] font-medium">Tasmi</span>
-    </button>
-    <button onclick="switchTab('history')" id="nav-btn-history" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
-      <span class="text-xl">📊</span>
-      <span class="text-[10px] font-medium">Riwayat</span>
-    </button>
-    <button onclick="switchTab('settings')" id="nav-btn-settings" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
-      <span class="text-xl">⚙️</span>
-      <span class="text-[10px] font-medium">Pengaturan</span>
-    </button>
-  </nav>
+  <!-- FOOTER INFORMASI (DESKTOP LAYOUT) -->
+  <footer id="appFooter" class="mt-auto border-t border-slate-800/80 py-8 px-6 lg:px-12 text-center space-y-3 text-xs text-slate-400 bg-slate-950/60">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">📖</span>
+        <span id="footerBrandTitle" class="font-extrabold text-sm text-white">PENTASMI AL-QUR'AN</span>
+        <span class="text-slate-600">|</span>
+        <span id="footerBrandDesc" class="text-xs text-slate-400">Platform AI Menyimak Hafalan Al-Qur'an</span>
+      </div>
+      
+      <p id="footerCopyright" class="text-xs text-slate-500">
+        © 2026 Pentasmi Al-Qur'an. Developed by SamaDigi.
+      </p>
+    </div>
+  </footer>
 
   <!-- MODAL LOGIN PENGUJI / GURU -->
   <div id="loginModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-xs moving-border-box">
-      <div class="moving-border-inner bg-slate-900 p-5 rounded-2xl space-y-4 text-left">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h3 class="font-bold text-sm text-white flex items-center gap-1.5">
+    <div class="w-full max-w-sm moving-border-box">
+      <div class="moving-border-inner bg-slate-900 p-6 rounded-3xl space-y-4 text-left">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
             <span>🔐</span> Masuk Penguji / Guru
           </h3>
-          <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white text-base">✕</button>
+          <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
         </div>
 
-        <form id="loginForm" onsubmit="submitLoginForm(event)" class="space-y-3">
+        <form id="loginForm" onsubmit="submitLoginForm(event)" class="space-y-3.5">
           <div>
             <label class="block text-xs text-slate-300 mb-1 font-medium">Username</label>
-            <input id="loginUsername" type="text" required placeholder="admin" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input id="loginUsername" type="text" required placeholder="admin" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500">
           </div>
 
           <div>
             <label class="block text-xs text-slate-300 mb-1 font-medium">Password</label>
             <div class="relative">
-              <input id="loginPassword" type="password" required placeholder="123" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500 pr-9">
-              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIcon')" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200 text-xs">
+              <input id="loginPassword" type="password" required placeholder="123" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500 pr-10">
+              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 text-xs">
                 <span id="eyeIcon">👁️</span>
               </button>
             </div>
@@ -816,7 +915,7 @@
 
           <div id="loginErrorMsg" class="text-xs text-rose-400 hidden"></div>
 
-          <button type="submit" id="loginSubmitBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold text-xs shadow-md transition">
+          <button type="submit" id="loginSubmitBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold text-xs shadow-md transition">
             Masuk Sekarang
           </button>
         </form>
@@ -824,11 +923,9 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT: QURAN DATABASE & INTELLIGENT FUZZY SPEECH MATCHER -->
+  <!-- JAVASCRIPT LOGIC & SPEECH RECOGNITION ENGINE -->
   <script>
-    /* ===============================================================
-       1. DATA AL-QUR'AN DATASET LENGKAP
-       =============================================================== */
+    /* 1. DATA AL-QUR'AN DATASET LENGKAP */
     const QURAN_SURAHS = [
       { number: 1, name: "Al-Fatihah", arName: "الفاتحة", juz: 1, totalAyat: 7 },
       { number: 78, name: "An-Naba'", arName: "النبأ", juz: 30, totalAyat: 40 },
@@ -870,7 +967,7 @@
       { number: 114, name: "An-Nas", arName: "الناس", juz: 30, totalAyat: 6 }
     ];
 
-    // Embedded Database Teks Ayat
+    // Embedded Database Ayat
     const AYAT_DATABASE = {
       // QS. Al-Fatihah (1)
       "1_1": { ar: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ", latin: "Bismillaahir-rahmaanir-rahiim", tr: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
@@ -920,10 +1017,9 @@
     let currentSessionUser = null;
     let activeTab = 'home';
     let isLandingMode = true;
-    let isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     let currentSpeechLang = 'ar-SA';
 
-    // Live Tasmi Session State
+    // State Sesi Live Tasmi
     let liveState = {
       studentName: '',
       juz: 30,
@@ -957,25 +1053,20 @@
       const toast = document.getElementById('customToast');
       document.getElementById('toastIcon').innerText = icon;
       document.getElementById('toastMessage').innerText = message;
-      toast.classList.remove('-translate-y-20', 'opacity-0');
+      toast.classList.remove('-translate-y-24', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
       setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('-translate-y-20', 'opacity-0');
+        toast.classList.add('-translate-y-24', 'opacity-0');
       }, 2500);
     }
 
-    /* ===============================================================
-       NORMALISASI KHUSUS RASM UTHMANI & SPEECH RECOGNITION
-       =============================================================== */
+    /* Normalisasi Karakter Rasm Uthmani & Fonetik Arab */
     function normalizeArabicText(text) {
       if (!text) return '';
       return text
-        // 1. Ubah alif khanjariyah (\u0670) dan huruf kecil Uthmani menjadi huruf penuh
         .replace(/[\u0670\u06E5\u06E6]/g, 'ا')
-        // 2. Hapus Harakat, Tanween, Tanda Waqaf, Tatweel
         .replace(/[\u064B-\u065F\u06D6-\u06ED\u0610-\u061A\u08F0-\u08FF\u0640]/g, '')
-        // 3. Normalisasi bentuk Alif
         .replace(/[إأآٱ]/g, 'ا')
         .replace(/ة/g, 'ه')
         .replace(/[ىي]/g, 'ي')
@@ -1012,7 +1103,6 @@
         .trim();
     }
 
-    // Levenshtein Distance for Phonetic Similarity
     function getLevenshteinDistance(a, b) {
       if (a.length === 0) return b.length;
       if (b.length === 0) return a.length;
@@ -1043,7 +1133,6 @@
       return maxLen === 0 ? 1.0 : (1.0 - (distance / maxLen));
     }
 
-    // Fuzzy Token Matcher Khusus Dialek & Ejaan Android
     function isArabicWordMatched(targetWordAr, targetWordLt, spokenCombinedText, spokenTokens) {
       const normTargetAr = normalizeArabicText(targetWordAr);
       const normTargetLt = normalizeLatinPhonetics(targetWordLt || '');
@@ -1052,17 +1141,9 @@
 
       if (!normTargetAr && !normTargetLt) return false;
 
-      // 1. Cek langsung substring dalam keseluruhan transkrip suara Arab
-      if (normTargetAr && normTargetAr.length >= 2 && normSpokenAll.includes(normTargetAr)) {
-        return true;
-      }
+      if (normTargetAr && normTargetAr.length >= 2 && normSpokenAll.includes(normTargetAr)) return true;
+      if (normTargetLt && normTargetLt.length >= 2 && normSpokenLtAll.includes(normTargetLt)) return true;
 
-      // 2. Cek langsung substring dalam keseluruhan transkrip suara Latin
-      if (normTargetLt && normTargetLt.length >= 2 && normSpokenLtAll.includes(normTargetLt)) {
-        return true;
-      }
-
-      // 3. Cek variasi partikel awalan (waw / fa / lam / ba / alif-lam)
       const prefixes = ['و', 'ف', 'ب', 'ل', 'ال'];
       for (const p of prefixes) {
         if (normTargetAr.startsWith(p) && normTargetAr.length > p.length + 1) {
@@ -1071,27 +1152,15 @@
         }
       }
 
-      // 4. Cek token per token dengan skor kemiripan Levenshtein
       for (const token of spokenTokens) {
         if (!token || token.length < 2) continue;
-
         if (normTargetAr) {
-          if (token === normTargetAr || token.includes(normTargetAr) || normTargetAr.includes(token)) {
-            return true;
-          }
-          // Kemiripan >= 60%
-          if (getWordSimilarity(normTargetAr, token) >= 0.60) {
-            return true;
-          }
+          if (token === normTargetAr || token.includes(normTargetAr) || normTargetAr.includes(token)) return true;
+          if (getWordSimilarity(normTargetAr, token) >= 0.60) return true;
         }
-
         if (normTargetLt) {
-          if (token === normTargetLt || token.includes(normTargetLt) || normTargetLt.includes(token)) {
-            return true;
-          }
-          if (getWordSimilarity(normTargetLt, token) >= 0.60) {
-            return true;
-          }
+          if (token === normTargetLt || token.includes(normTargetLt) || normTargetLt.includes(token)) return true;
+          if (getWordSimilarity(normTargetLt, token) >= 0.60) return true;
         }
       }
 
@@ -1129,11 +1198,7 @@
 
     function toggleTheme() {
       const isDark = document.documentElement.classList.contains('dark');
-      if (isDark) {
-        localStorage.setItem('app_theme', 'light');
-      } else {
-        localStorage.setItem('app_theme', 'dark');
-      }
+      localStorage.setItem('app_theme', isDark ? 'light' : 'dark');
       initTheme();
     }
 
@@ -1151,12 +1216,12 @@
           const rect = heroCard.getBoundingClientRect();
           const x = e.clientX - rect.left - rect.width / 2;
           const y = e.clientY - rect.top - rect.height / 2;
-          const rotX = (y / rect.height) * -8;
-          const rotY = (x / rect.width) * 8;
-          heroCard.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+          const rotX = (y / rect.height) * -6;
+          const rotY = (x / rect.width) * 6;
+          heroCard.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
         });
         heroCard.addEventListener('mouseleave', () => {
-          heroCard.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)';
+          heroCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
         });
       }
     }
@@ -1184,7 +1249,7 @@
           })
           .apiValidateSession(token);
       } else {
-        currentSessionUser = { username: 'admin', fullName: 'Guru Penguji (GitHub Host)', role: 'Admin' };
+        currentSessionUser = { username: 'admin', fullName: 'Guru Penguji (Desktop Host)', role: 'Admin' };
         showLandingPage();
       }
     }
@@ -1196,7 +1261,7 @@
       document.getElementById('view-tasmi').classList.add('hidden');
       document.getElementById('view-history').classList.add('hidden');
       document.getElementById('view-settings').classList.add('hidden');
-      document.getElementById('authHeaderBtn').innerText = currentSessionUser ? 'Dashboard' : 'Masuk';
+      document.getElementById('authHeaderBtn').innerText = currentSessionUser ? 'Dashboard' : 'Masuk Penguji';
     }
 
     function showAppDashboard() {
@@ -1290,7 +1355,7 @@
           submitBtn.disabled = false;
           if (username === 'admin' && pass === '123') {
             currentSessionUser = { username: 'admin', fullName: 'Administrator Penguji', role: 'Admin' };
-            localStorage.setItem('tasmi_auth_token', 'github-session-token');
+            localStorage.setItem('tasmi_auth_token', 'desktop-session-token');
             closeLoginModal();
             showAppDashboard();
             showToast('Berhasil masuk panel penguji!', '✅');
@@ -1327,19 +1392,15 @@
         const btn = document.getElementById(`nav-btn-${tab}`);
         if (btn) {
           if (tab === tabName) {
-            btn.className = 'flex flex-col items-center space-y-1 text-blue-500 transition';
-            btn.querySelector('span:last-child').className = 'text-[10px] font-bold';
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold text-blue-400 bg-blue-600/20 border border-blue-500/30 transition flex items-center space-x-2';
           } else {
-            btn.className = 'flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition';
-            btn.querySelector('span:last-child').className = 'text-[10px] font-medium';
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2';
           }
         }
       });
 
       const targetView = document.getElementById(`view-${tabName}`);
-      if (targetView) {
-        targetView.classList.remove('hidden');
-      }
+      if (targetView) targetView.classList.remove('hidden');
 
       if (tabName === 'history') {
         loadHistoryData();
@@ -1351,7 +1412,7 @@
     function startDirectTasmi() {
       switchTab('tasmi');
       resetToNewTasmi();
-      showToast('Silakan tentukan target surat atau langsung mulai.', '📖');
+      showToast('Silakan tentukan target surat untuk memulai ujian.', '📖');
     }
 
     function initQuranSelectors() {
@@ -1450,7 +1511,7 @@
         document.getElementById('micPermissionStatusText').innerText = '✅ Mikrofon Diizinkan & Aktif';
         initLiveAudioWave(stream);
       } catch (err) {
-        showToast('Mikrofon diblokir di browser Anda. Harap izinkan akses mic.', '⚠️');
+        showToast('Mikrofon diblokir di browser. Harap izinkan akses mic.', '⚠️');
         document.getElementById('micPermissionStatusText').innerText = '❌ Mikrofon Diblokir Browser';
       }
     }
@@ -1486,7 +1547,7 @@
 
           waveBars.forEach((bar, bIdx) => {
             const val = dataArr[bIdx % dataArr.length] || avg;
-            const h = Math.max(3, Math.min(16, (val / 255) * 18));
+            const h = Math.max(4, Math.min(22, (val / 255) * 26));
             bar.style.height = `${h}px`;
           });
 
@@ -1495,7 +1556,7 @@
 
         renderWave();
       } catch (err) {
-        console.log('Audio visualizer init fallback:', err);
+        console.log('Audio visualizer fallback:', err);
       }
     }
 
@@ -1562,12 +1623,12 @@
       const btnIn = document.getElementById('btnLangIndo');
 
       if (langCode === 'ar-SA') {
-        btnAr.className = 'px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-bold border border-emerald-400/40 transition';
-        btnIn.className = 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold border border-slate-700 hover:text-white transition';
+        btnAr.className = 'px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs border border-emerald-400/40 transition';
+        btnIn.className = 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700 hover:text-white transition';
         showToast('Mode Pengenalan: Bahasa Arab', '🇸🇦');
       } else {
-        btnIn.className = 'px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold border border-blue-400/40 transition';
-        btnAr.className = 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold border border-slate-700 hover:text-white transition';
+        btnIn.className = 'px-3 py-1.5 rounded-xl bg-blue-600 text-white font-bold text-xs border border-blue-400/40 transition';
+        btnAr.className = 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700 hover:text-white transition';
         showToast('Mode Pengenalan: Fonetik Latin', '🇮🇩');
       }
 
@@ -1577,7 +1638,7 @@
     }
 
     async function startLiveTasmiSession() {
-      const studentName = document.getElementById('inputStudentName').value.trim() || 'Siswa Tasmi';
+      const studentName = document.getElementById('inputStudentName').value.trim() || 'Santri Tasmi';
       const selectJuz = document.getElementById('selectJuz');
       const selectSurah = document.getElementById('selectSurah');
       
@@ -1630,19 +1691,17 @@
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Sentuh kata jika perlu.', 'amber');
+        updateMobileStatusUI('Browser tidak mendukung Web Speech API.', 'amber');
         return;
       }
 
       try {
         if (liveState.speechRecognition) {
-          try { 
-            liveState.speechRecognition.abort(); 
-          } catch(e) {}
+          try { liveState.speechRecognition.abort(); } catch(e) {}
         }
 
         const recognition = new SpeechRecognition();
-        recognition.continuous = !isMobileDevice;
+        recognition.continuous = true;
         recognition.interimResults = true;
         recognition.maxAlternatives = 5;
         recognition.lang = currentSpeechLang;
@@ -1650,16 +1709,11 @@
         recognition.onstart = () => {
           liveState.isListening = true;
           liveState.isRecognitionRunning = true;
-          updateMobileStatusUI('Mikrofon HP Mendengar...', 'emerald');
-          const badge = document.getElementById('liveMicBadge');
-          if (badge) {
-            badge.className = 'text-[11px] flex items-center gap-1 text-emerald-400 font-semibold';
-            badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Mendengar';
-          }
+          updateMobileStatusUI('Mikrofon Mendengarkan Suara Santri...', 'emerald');
         };
 
         recognition.onspeechstart = () => {
-          updateMobileStatusUI('Suara Santri Masuk...', 'emerald');
+          updateMobileStatusUI('Suara Santri Masuk (Mengevaluasi)...', 'emerald');
         };
 
         recognition.onresult = (event) => {
@@ -1675,11 +1729,9 @@
         };
 
         recognition.onerror = (e) => {
-          console.log('Mobile Speech Recognition Event:', e.error);
+          console.log('Speech Recognition Event:', e.error);
           if (e.error === 'not-allowed') {
             updateMobileStatusUI('Izin Mic ditolak. Ketuk "Segarkan Mic".', 'rose');
-          } else if (e.error === 'network') {
-            updateMobileStatusUI('Koneksi internet diperlukan. Coba mode Latin.', 'amber');
           } else if (e.error === 'no-speech') {
             updateMobileStatusUI('Menyimak suara bacaan santri...', 'emerald');
           }
@@ -1703,14 +1755,13 @@
         liveState.speechRecognition = recognition;
       } catch (e) {
         console.log('Speech recognition launch error:', e);
-        updateMobileStatusUI('Ketuk "Segarkan Mic" untuk memulai AI.', 'amber');
       }
     }
 
     function restartMobileSpeechRecognition() {
       liveState.isListening = true;
       initSpeechRecognition();
-      showToast('Mikrofon HP disegarkan!', '🎙️');
+      showToast('Mikrofon disegarkan!', '🎙️');
     }
 
     function updateMobileStatusUI(text, color) {
@@ -1718,9 +1769,9 @@
       const pulseDot = document.getElementById('mobileMicPulseDot');
       if (statusText) statusText.innerText = text;
       if (pulseDot) {
-        if (color === 'emerald') pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
-        else if (color === 'amber') pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
-        else pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+        if (color === 'emerald') pulseDot.className = 'w-3 h-3 rounded-full bg-emerald-400 animate-pulse';
+        else if (color === 'amber') pulseDot.className = 'w-3 h-3 rounded-full bg-amber-400';
+        else pulseDot.className = 'w-3 h-3 rounded-full bg-rose-400';
       }
     }
 
@@ -1745,7 +1796,6 @@
       const spokenNormLt = normalizeLatinPhonetics(transcript);
       const spokenTokens = (spokenNormAr + ' ' + spokenNormLt).split(/\s+/).filter(t => t.length > 0);
 
-      // Evaluasi Kata Per Kata dengan Fuzzy Token Matcher
       targetWordsAr.forEach((wordAr, idx) => {
         const wordLt = targetWordsLatin[idx] || '';
         const isWordMatched = isArabicWordMatched(wordAr, wordLt, transcript, spokenTokens);
@@ -1755,16 +1805,14 @@
         }
       });
 
-      // Hitung % Kecocokan Realtime
       const totalWords = targetWordsAr.length;
       const matchScore = totalWords > 0 ? Math.min(100, Math.round((liveState.matchedWordIndices.size / totalWords) * 100)) : 100;
       
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
-      // Otomatisasi AI: Tuntas Benar jika membaca >= 50% kata atau tinggal 1 kata
       if (matchScore >= 50 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1) || (totalWords === 1 && liveState.matchedWordIndices.size === 1)) {
-        document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
+        document.getElementById('liveCurrentAyahLabel').className = 'text-sm font-bold text-emerald-400 bg-emerald-950/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         
         triggerAutoAdvance(true);
@@ -1777,10 +1825,10 @@
       const chipEl = document.getElementById(`word-chip-${idx}`);
 
       if (wordEl) {
-        wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-xl border border-emerald-500/60 shadow-md shadow-emerald-500/20 font-bold transition-all duration-200 cursor-pointer';
+        wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-500/60 shadow-md shadow-emerald-500/20 font-bold transition-all duration-200 cursor-pointer';
       }
       if (chipEl) {
-        chipEl.className = 'text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 font-bold';
+        chipEl.className = 'text-xs px-3 py-1 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 font-bold';
         chipEl.innerHTML = `✓ ${wordAr || ''}`;
       }
     }
@@ -1795,7 +1843,7 @@
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
       if (matchScore >= 50 || liveState.matchedWordIndices.size >= totalWords - 1) {
-        document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
+        document.getElementById('liveCurrentAyahLabel').className = 'text-sm font-bold text-emerald-400 bg-emerald-950/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         triggerAutoAdvance(true);
       }
@@ -1822,7 +1870,7 @@
         if (countdownEl) countdownEl.classList.add('hidden');
         liveState.autoAdvanceTimer = null;
         markCurrentAyah(isSuccess, errorMessage);
-      }, 800);
+      }, 750);
     }
 
     function startLiveTimer() {
@@ -1854,7 +1902,7 @@
         tr: `Membaca ayat ke-${idx} dari surat ${liveState.surah.name}.`
       };
 
-      document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-amber-400 bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-500/30';
+      document.getElementById('liveCurrentAyahLabel').className = 'text-sm font-bold text-amber-400 bg-amber-950/50 px-3.5 py-1.5 rounded-xl border border-amber-500/30';
       document.getElementById('liveCurrentAyahLabel').innerHTML = `🟡 Ayat ${idx} Sedang Dibaca`;
       
       const words = ayahData.ar.split(/\s+/).filter(w => w.trim().length > 0);
@@ -1862,12 +1910,12 @@
 
       const arabicContainer = document.getElementById('liveArabicText');
       arabicContainer.innerHTML = words.map((w, wIdx) => `
-        <span id="ayah-word-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="ayah-word-token px-2 py-0.5 rounded-xl border border-transparent hover:border-slate-700 transition-all duration-300">${w}</span>
+        <span id="ayah-word-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="ayah-word-token px-3 py-1 rounded-2xl border border-transparent hover:border-slate-700 transition-all duration-300">${w}</span>
       `).join(' ');
 
       const trackerContainer = document.getElementById('liveWordTracker');
       trackerContainer.innerHTML = words.map((w, wIdx) => `
-        <span id="word-chip-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 transition-all font-mono cursor-pointer">
+        <span id="word-chip-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 transition-all font-mono cursor-pointer">
           ⚪ ${w}
         </span>
       `).join('');
@@ -1923,17 +1971,11 @@
       }
 
       if (liveState.mediaRecorder && liveState.mediaRecorder.state !== 'inactive') {
-        try {
-          liveState.mediaRecorder.stop();
-        } catch (e) {
-          console.log("MediaRecorder stop notice:", e);
-        }
+        try { liveState.mediaRecorder.stop(); } catch (e) {}
       }
 
       if (liveState.mediaStream) {
-        try {
-          liveState.mediaStream.getTracks().forEach(track => track.stop());
-        } catch (e) {}
+        try { liveState.mediaStream.getTracks().forEach(track => track.stop()); } catch (e) {}
       }
 
       const total = liveState.totalAyahs;
@@ -1962,11 +2004,11 @@
         errorListContainer.innerHTML = '<p class="text-xs text-emerald-400 italic">Alhamdulillah, tidak ada kesalahan tercatat!</p>';
       } else {
         errorListContainer.innerHTML = liveState.errorsList.map(err => `
-          <div class="p-2.5 rounded-xl bg-rose-950/40 border border-rose-600/30 text-xs text-rose-200 flex items-start space-x-2">
-            <span>❌</span>
+          <div class="p-3 rounded-2xl bg-rose-950/40 border border-rose-600/30 text-xs text-rose-200 flex items-start space-x-3">
+            <span class="text-base">❌</span>
             <div>
               <p class="font-bold text-rose-300">Ayat ${err.ayah}</p>
-              <p class="text-[11px] text-slate-300">${err.note}</p>
+              <p class="text-xs text-slate-300">${err.note}</p>
             </div>
           </div>
         `).join('');
@@ -2053,18 +2095,18 @@
       if (!recentContainer) return;
 
       if (!recentList || recentList.length === 0) {
-        recentContainer.innerHTML = '<div class="p-4 text-center text-xs text-slate-500 glass-card rounded-2xl">Belum ada riwayat tasmi.</div>';
+        recentContainer.innerHTML = '<div class="col-span-full p-8 text-center text-xs text-slate-500 glass-card rounded-2xl">Belum ada riwayat tasmi.</div>';
         return;
       }
 
       recentContainer.innerHTML = recentList.map(item => `
-        <div class="glass-card p-3 rounded-2xl border border-slate-800 flex items-center justify-between">
-          <div class="space-y-0.5">
-            <p class="text-xs font-bold text-white">${item.surahName} <span class="text-slate-400 font-normal">(${item.startAyah}-${item.endAyah})</span></p>
-            <p class="text-[10px] text-slate-400">${item.studentName || 'Siswa'} • Juz ${item.juz}</p>
+        <div class="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+          <div class="space-y-1">
+            <p class="text-sm font-bold text-white">${item.surahName} <span class="text-slate-400 font-normal">(${item.startAyah}-${item.endAyah})</span></p>
+            <p class="text-xs text-slate-400">${item.studentName || 'Santri'} • Juz ${item.juz}</p>
           </div>
           <div class="text-right">
-            <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold ${item.accuracyScore >= 80 ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30' : 'bg-rose-950/60 text-rose-400 border border-rose-500/30'}">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${item.accuracyScore >= 80 ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/30' : 'bg-rose-950/70 text-rose-400 border border-rose-500/30'}">
               ${item.accuracyScore}%
             </span>
           </div>
@@ -2075,7 +2117,7 @@
     function loadHistoryData() {
       const container = document.getElementById('historyListContainer');
       if (!container) return;
-      container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400">Memuat data...</div>';
+      container.innerHTML = '<div class="col-span-full p-12 text-center text-xs text-slate-400">Memuat data...</div>';
 
       if (isGASRuntime()) {
         google.script.run
@@ -2094,23 +2136,23 @@
       if (!container) return;
 
       if (list.length === 0) {
-        container.innerHTML = '<div class="p-6 text-center text-xs text-slate-500 glass-card rounded-2xl">Belum ada data tasmi tersimpan.</div>';
+        container.innerHTML = '<div class="col-span-full p-12 text-center text-xs text-slate-500 glass-card rounded-3xl">Belum ada data tasmi tersimpan.</div>';
         return;
       }
 
       container.innerHTML = list.map(item => `
-        <div class="glass-card p-4 rounded-2xl border border-slate-800 space-y-2.5">
+        <div class="glass-card p-5 rounded-3xl border border-slate-800 space-y-3 hover:border-slate-700 transition">
           <div class="flex items-center justify-between">
             <div>
-              <h4 class="text-sm font-bold text-white">QS. ${item.surahName}</h4>
-              <p class="text-[11px] text-slate-400">Ayat ${item.startAyah}–${item.endAyah} • Juz ${item.juz}</p>
+              <h4 class="text-base font-bold text-white">QS. ${item.surahName}</h4>
+              <p class="text-xs text-slate-400">Ayat ${item.startAyah}–${item.endAyah} • Juz ${item.juz}</p>
             </div>
-            <span class="px-2.5 py-1 rounded-xl text-xs font-black ${item.accuracyScore >= 80 ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/30' : 'bg-amber-950/70 text-amber-400 border border-amber-500/30'}">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${item.accuracyScore >= 80 ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40' : 'bg-amber-950/80 text-amber-400 border border-amber-500/40'}">
               Nilai: ${item.accuracyScore}
             </span>
           </div>
 
-          <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-3">
             <span>👤 ${item.studentName || 'Peserta'}</span>
             <span>Kesalahan: <b class="${item.errorCount > 0 ? 'text-rose-400' : 'text-emerald-400'}">${item.errorCount}</b></span>
           </div>
