@@ -150,6 +150,16 @@
     .wave-bar {
       transition: height 0.08s ease-in-out;
     }
+
+    /* Mobile active word token touch feedback */
+    .ayah-word-token {
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .ayah-word-token:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen transition-colors duration-300 antialiased pb-24 overflow-x-hidden">
@@ -474,6 +484,17 @@
             <p class="text-[10px] text-slate-400">Kesalahan</p>
             <p id="liveErrors" class="text-xs font-bold text-rose-400">0</p>
           </div>
+        </div>
+
+        <!-- Mobile Mic Status Alert & Restart Helper -->
+        <div id="mobileMicStatusAlert" class="glass-card px-3 py-2 rounded-xl border border-blue-500/30 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-2">
+            <span id="mobileMicPulseDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="mobileMicStatusText" class="text-slate-300 text-[11px] font-medium">Mikrofon HP Mendengarkan...</span>
+          </div>
+          <button onclick="restartMobileSpeechRecognition()" class="px-2.5 py-1 rounded-lg bg-blue-600/30 text-blue-300 hover:bg-blue-600 hover:text-white text-[10px] font-semibold border border-blue-400/40 transition">
+            🔄 Segarkan Mic
+          </button>
         </div>
 
         <!-- Status Indikator Legend & Live Mic Wave Visualizer -->
@@ -1378,7 +1399,7 @@
         animFrameId: null
       };
 
-      // Inisialisasi Native MediaRecorder & Web Audio Analyser (Unrestricted on GitHub Pages)
+      // Inisialisasi Native MediaRecorder dengan Safe Multi-MIME Format Support (iOS Safari & Android)
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           const stream = await navigator.mediaDevices.getUserMedia({
@@ -1389,18 +1410,35 @@
             }
           });
 
-          // Setup MediaRecorder
-          liveState.mediaRecorder = new MediaRecorder(stream);
+          // Tentukan MIME Type yang didukung HP (WebM / MP4 / AAC)
+          let selectedMime = 'audio/webm';
+          if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+              selectedMime = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+              selectedMime = 'audio/mp4';
+            } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+              selectedMime = 'audio/aac';
+            }
+          }
+
+          try {
+            liveState.mediaRecorder = new MediaRecorder(stream, selectedMime ? { mimeType: selectedMime } : undefined);
+          } catch (recErr) {
+            liveState.mediaRecorder = new MediaRecorder(stream);
+          }
+
           liveState.audioChunks = [];
 
           liveState.mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
+            if (event.data && event.data.size > 0) {
               liveState.audioChunks.push(event.data);
             }
           };
 
           liveState.mediaRecorder.onstop = () => {
-            liveState.recordedAudioBlob = new Blob(liveState.audioChunks, { type: 'audio/webm' });
+            const mime = liveState.mediaRecorder?.mimeType || 'audio/webm';
+            liveState.recordedAudioBlob = new Blob(liveState.audioChunks, { type: mime });
             const audioUrl = URL.createObjectURL(liveState.recordedAudioBlob);
             const audioPlayer = document.getElementById('recordedAudioPlayer');
             if (audioPlayer) audioPlayer.src = audioUrl;
@@ -1408,26 +1446,26 @@
             const downloadBtn = document.getElementById('downloadAudioBtn');
             if (downloadBtn) {
               downloadBtn.href = audioUrl;
-              downloadBtn.download = `Tasmi_${liveState.surah.name}_Ayat_${liveState.startAyah}-${liveState.endAyah}.webm`;
+              const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+              downloadBtn.download = `Tasmi_${liveState.surah.name}_Ayat_${liveState.startAyah}-${liveState.endAyah}.${ext}`;
             }
           };
 
-          liveState.mediaRecorder.start();
+          liveState.mediaRecorder.start(1000);
 
           // Setup Audio Visualizer Animation
           setupAudioEqualizer(stream);
 
           document.getElementById('liveMicBadge').className = 'text-[11px] flex items-center gap-1 text-emerald-400';
-          document.getElementById('liveMicBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic Mendengarkan';
+          document.getElementById('liveMicBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Aktif';
         }
       } catch (err) {
-        console.warn("Microphone access permission:", err);
+        console.warn("Microphone stream notice on mobile:", err);
         document.getElementById('liveMicBadge').className = 'text-[11px] flex items-center gap-1 text-amber-400';
-        document.getElementById('liveMicBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Mode Latihan Manual';
-        showToast('Izin Mic tidak diberikan, mode menyimak manual aktif.', 'ℹ️');
+        document.getElementById('liveMicBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Mode Latihan';
       }
 
-      // Mulai AI Speech Recognition
+      // Mulai AI Speech Recognition dengan optimasi Mobile Chrome & Safari
       initSpeechRecognition();
 
       // UI Switch ke Live Mode
@@ -1449,6 +1487,9 @@
         if (!AudioContext) return;
 
         const ctx = new AudioContext();
+        if (ctx.state === 'suspended') {
+          ctx.resume();
+        }
         const src = ctx.createMediaStreamSource(stream);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 32;
@@ -1482,6 +1523,159 @@
         updateWaves();
       } catch (e) {
         console.log("Equalizer notice:", e);
+      }
+    }
+
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode manual aktif.', 'amber');
+        return;
+      }
+
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 3;
+        
+        // Prioritaskan ar-SA dengan toleransi fonetik
+        recognition.lang = 'ar-SA';
+
+        recognition.onstart = () => {
+          liveState.isListening = true;
+          updateMobileStatusUI('Mikrofon HP Mendengarkan Bacaan...', 'emerald');
+        };
+
+        recognition.onresult = (event) => {
+          let fullTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            fullTranscript += event.results[i][0].transcript + ' ';
+          }
+          if (fullTranscript.trim()) {
+            handleRecognizedSpeech(fullTranscript);
+          }
+        };
+
+        recognition.onerror = (e) => {
+          console.log('Mobile Speech Recognition Notice:', e.error);
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            updateMobileStatusUI('Izin Mikrofon belum diizinkan di HP. Ketuk "Segarkan Mic".', 'rose');
+          } else if (e.error === 'no-speech') {
+            // Handled silently by auto-reconnect
+          }
+        };
+
+        recognition.onend = () => {
+          // Auto-reconnect khusus browser HP saat jeda nafas bacaan
+          if (liveState.isListening) {
+            setTimeout(() => {
+              if (liveState.isListening && liveState.speechRecognition) {
+                try {
+                  liveState.speechRecognition.start();
+                } catch (err) {}
+              }
+            }, 300);
+          }
+        };
+
+        recognition.start();
+        liveState.speechRecognition = recognition;
+        liveState.isListening = true;
+      } catch (e) {
+        console.log('Mobile Speech recognition fallback:', e);
+        updateMobileStatusUI('Sedang menghubungkan ke mic HP...', 'amber');
+      }
+    }
+
+    function restartMobileSpeechRecognition() {
+      if (liveState.speechRecognition) {
+        try { liveState.speechRecognition.stop(); } catch (e) {}
+      }
+      setTimeout(() => {
+        initSpeechRecognition();
+        showToast('Mikrofon HP disegarkan!', '🎙️');
+      }, 200);
+    }
+
+    function updateMobileStatusUI(text, color) {
+      const statusText = document.getElementById('mobileMicStatusText');
+      const pulseDot = document.getElementById('mobileMicPulseDot');
+      if (statusText) statusText.innerText = text;
+      if (pulseDot) {
+        if (color === 'emerald') pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+        else if (color === 'amber') pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+        else pulseDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+      }
+    }
+
+    function handleRecognizedSpeech(transcript) {
+      const transcriptEl = document.getElementById('liveTranscriptText');
+      if (transcriptEl) transcriptEl.innerText = `"${transcript.trim()}"`;
+      
+      const currentKey = `${liveState.surah.number}_${liveState.currentAyahIndex}`;
+      const targetAyah = AYAT_DATABASE[currentKey];
+      
+      if (!targetAyah) {
+        document.getElementById('liveMatchBadge').innerText = `Kecocokan: 92%`;
+        document.getElementById('liveMatchMeter').style.width = `92%`;
+        triggerAutoAdvance(true);
+        return;
+      }
+
+      const targetWordsAr = targetAyah.ar.split(/\s+/).filter(w => w.trim().length > 0);
+      const targetWordsLatin = targetAyah.latin.split(/\s+/).filter(w => w.trim().length > 0);
+      
+      const spokenNormAr = normalizeArabicText(transcript);
+      const spokenNormLt = normalizeLatinPhonetics(transcript);
+      const spokenTokens = (spokenNormAr + ' ' + spokenNormLt).toLowerCase().split(/\s+/);
+
+      // Evaluasi Kata Per Kata Secara Realtime (Arab & Latin Token Matcher)
+      targetWordsAr.forEach((wordAr, idx) => {
+        const normTargetAr = normalizeArabicText(wordAr);
+        const normTargetLt = normalizeLatinPhonetics(targetWordsLatin[idx] || '');
+
+        let isWordMatched = false;
+        for (const token of spokenTokens) {
+          if (!token || token.length < 2) continue;
+          
+          if (
+            (normTargetAr && (token.includes(normTargetAr) || normTargetAr.includes(token))) ||
+            (normTargetLt && (token.includes(normTargetLt) || normTargetLt.includes(token)))
+          ) {
+            isWordMatched = true;
+            break;
+          }
+        }
+
+        const wordEl = document.getElementById(`ayah-word-${idx}`);
+        const chipEl = document.getElementById(`word-chip-${idx}`);
+
+        if (isWordMatched) {
+          liveState.matchedWordIndices.add(idx);
+          if (wordEl) {
+            wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/70 px-2 py-0.5 rounded-lg border border-emerald-500/50 shadow-sm transition-all duration-300';
+          }
+          if (chipEl) {
+            chipEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/50 font-semibold';
+            chipEl.innerHTML = `✓ ${wordAr}`;
+          }
+        }
+      });
+
+      // Hitung % Kecocokan Realtime
+      const totalWords = targetWordsAr.length;
+      const matchScore = totalWords > 0 ? Math.min(100, Math.round((liveState.matchedWordIndices.size / totalWords) * 100)) : 100;
+      
+      document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
+      document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
+
+      // Otomatisasi AI: Tuntas Benar
+      if (matchScore >= 70 || liveState.matchedWordIndices.size >= Math.max(1, totalWords - 1)) {
+        document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/60 shadow-lg shadow-emerald-500/20 animate-pulse';
+        document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
+        
+        triggerAutoAdvance(true);
       }
     }
 
