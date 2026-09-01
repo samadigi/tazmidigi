@@ -68,15 +68,15 @@
   <style>
     /* Custom Styling & Glassmorphism */
     .glass-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .light .glass-card {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(226, 232, 240, 0.85);
+      border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
     
@@ -141,8 +141,8 @@
     .ayah-text-ar {
       direction: rtl;
       font-family: 'Amiri', serif;
-      line-height: 2.3;
-      font-size: 1.65rem;
+      line-height: 2.35;
+      font-size: 1.75rem;
       text-align: right;
     }
 
@@ -156,9 +156,10 @@
       transition: all 0.2s ease;
       user-select: none;
       -webkit-user-select: none;
+      display: inline-block;
     }
     .ayah-word-token:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
   </style>
 </head>
@@ -226,7 +227,7 @@
         </h2>
 
         <p class="text-xs sm:text-sm text-slate-300 max-w-xs leading-relaxed">
-          AI cerdas yang mendengarkan melalui mikrofon perangkat Anda, mencocokkan teks ayat Al-Qur'an secara langsung, dan merekam suara siswa untuk evaluasi guru.
+          AI cerdas yang mendengarkan melalui mikrofon HP Anda, mencocokkan teks ayat Al-Qur'an secara langsung, dan merekam suara siswa untuk evaluasi guru.
         </p>
 
         <!-- CTA Buttons -->
@@ -490,28 +491,21 @@
         <div id="mobileMicStatusAlert" class="glass-card px-3 py-2 rounded-xl border border-blue-500/30 flex items-center justify-between text-xs">
           <div class="flex items-center space-x-2">
             <span id="mobileMicPulseDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="mobileMicStatusText" class="text-slate-300 text-[11px] font-medium">Mikrofon HP Mendengarkan...</span>
+            <span id="mobileMicStatusText" class="text-slate-200 text-[11px] font-medium">Mikrofon HP Siap Menyimak...</span>
           </div>
           <button onclick="restartMobileSpeechRecognition()" class="px-2.5 py-1 rounded-lg bg-blue-600/30 text-blue-300 hover:bg-blue-600 hover:text-white text-[10px] font-semibold border border-blue-400/40 transition">
             🔄 Segarkan Mic
           </button>
         </div>
 
-        <!-- Status Indikator Legend & Live Mic Wave Visualizer -->
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center space-x-2 text-[10px] text-slate-300">
+        <!-- Status Indikator Legend & Touch Hint -->
+        <div class="flex items-center justify-between px-1 text-[10px] text-slate-400">
+          <div class="flex items-center space-x-2">
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Benar</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Dibaca</span>
             <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Salah</span>
           </div>
-          
-          <!-- Audio Equalizer Visualizer Bars -->
-          <div class="flex items-end space-x-0.5 h-4 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
-            <div id="wave1" class="wave-bar w-1 bg-emerald-400 rounded-full h-1"></div>
-            <div id="wave2" class="wave-bar w-1 bg-emerald-400 rounded-full h-2"></div>
-            <div id="wave3" class="wave-bar w-1 bg-emerald-400 rounded-full h-3"></div>
-            <div id="wave4" class="wave-bar w-1 bg-emerald-400 rounded-full h-1"></div>
-          </div>
+          <span class="text-slate-400 italic">💡 Sentuh kata jika bising</span>
         </div>
 
         <!-- CURRENT AYAT DISPLAY (FOCAL CARD) -->
@@ -526,11 +520,11 @@
               </span>
             </div>
             <span id="liveMicBadge" class="text-[11px] flex items-center gap-1 text-emerald-400">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic Mendengarkan
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Mendengar
             </span>
           </div>
 
-          <!-- Teks Ayat Arab dengan Live Word Highlighting -->
+          <!-- Teks Ayat Arab dengan Live Word Highlighting & Interactive Touch Support -->
           <div id="liveArabicText" class="ayah-text-ar text-white text-2xl py-3 px-1 min-h-[95px] flex items-center justify-end flex-wrap gap-2 transition-all">
             بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
           </div>
@@ -952,9 +946,7 @@
       currentAyahWords: [],
       matchedWordIndices: new Set(),
       autoAdvanceTimer: null,
-      audioContext: null,
-      audioAnalyser: null,
-      animFrameId: null
+      lastRecognizedText: ''
     };
 
     // Helper Toast Notification
@@ -974,7 +966,7 @@
     function normalizeArabicText(text) {
       if (!text) return '';
       return text
-        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '') // Hapus Harakat & Tanda Tajwid
+        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '') // Hapus Harakat, Tanda Tajwid, Tatweel
         .replace(/[إأآٱ]/g, 'ا')
         .replace(/ة/g, 'ه')
         .replace(/ى/g, 'ي')
@@ -1020,7 +1012,7 @@
         return true;
       }
 
-      // 2. Cek variasi prefix partikel (Contoh: "ولم" vs "و لم")
+      // 2. Cek variasi partikel waw / fa / lam (Contoh: "ولم" vs "و لم")
       if (normTargetAr.startsWith('و') && normTargetAr.length > 2) {
         const withoutWaw = normTargetAr.slice(1);
         if (normSpokenAll.includes(withoutWaw)) return true;
@@ -1136,7 +1128,6 @@
           })
           .apiValidateSession(token);
       } else {
-        // GitHub / Standalone Mode Session
         currentSessionUser = { username: 'admin', fullName: 'Guru Penguji (GitHub Host)', role: 'Admin' };
         showLandingPage();
       }
@@ -1238,7 +1229,6 @@
           })
           .apiLogin(username, pass);
       } else {
-        // GitHub Pages Standalone Authentication (Offline + Online)
         setTimeout(() => {
           submitBtn.innerText = 'Masuk Sekarang';
           submitBtn.disabled = false;
@@ -1441,12 +1431,10 @@
         currentAyahWords: [],
         matchedWordIndices: new Set(),
         autoAdvanceTimer: null,
-        audioContext: null,
-        audioAnalyser: null,
-        animFrameId: null
+        lastRecognizedText: ''
       };
 
-      // KRUSIAL PADA ANDROID: Mulai Speech Recognition SECARA SINKRON langsung dari sentuhan user
+      // Inisialisasi Speech Recognition LANGSUNG secara sinkron (Krusial untuk Chrome Mobile)
       initSpeechRecognition();
 
       // UI Switch ke Live Mode
@@ -1458,77 +1446,12 @@
       startLiveTimer();
       renderCurrentLiveAyah();
       showToast('Sesi dimulai! Silakan membaca hafalan...', '🎙️');
-
-      // Inisialisasi MediaRecorder & Visualizer secara asinkron tanpa mengganggu Speech Recognition
-      initBackgroundRecorder();
-    }
-
-    async function initBackgroundRecorder() {
-      try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          }
-        });
-
-        let selectedMime = 'audio/webm';
-        if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
-          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-            selectedMime = 'audio/webm;codecs=opus';
-          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-            selectedMime = 'audio/mp4';
-          } else if (MediaRecorder.isTypeSupported('audio/aac')) {
-            selectedMime = 'audio/aac';
-          }
-        }
-
-        try {
-          liveState.mediaRecorder = new MediaRecorder(stream, selectedMime ? { mimeType: selectedMime } : undefined);
-        } catch (recErr) {
-          liveState.mediaRecorder = new MediaRecorder(stream);
-        }
-
-        liveState.audioChunks = [];
-
-        liveState.mediaRecorder.ondataavailable = (event) => {
-          if (event.data && event.data.size > 0) {
-            liveState.audioChunks.push(event.data);
-          }
-        };
-
-        liveState.mediaRecorder.onstop = () => {
-          const mime = liveState.mediaRecorder?.mimeType || 'audio/webm';
-          liveState.recordedAudioBlob = new Blob(liveState.audioChunks, { type: mime });
-          const audioUrl = URL.createObjectURL(liveState.recordedAudioBlob);
-          const audioPlayer = document.getElementById('recordedAudioPlayer');
-          if (audioPlayer) audioPlayer.src = audioUrl;
-          
-          const downloadBtn = document.getElementById('downloadAudioBtn');
-          if (downloadBtn) {
-            downloadBtn.href = audioUrl;
-            const ext = mime.includes('mp4') ? 'mp4' : 'webm';
-            downloadBtn.download = `Tasmi_${liveState.surah.name}_Ayat_${liveState.startAyah}-${liveState.endAyah}.${ext}`;
-          }
-        };
-
-        liveState.mediaRecorder.start(1000);
-        setupAudioEqualizer(stream);
-
-        document.getElementById('liveMicBadge').className = 'text-[11px] flex items-center gap-1 text-emerald-400';
-        document.getElementById('liveMicBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Aktif';
-      } catch (err) {
-        console.warn("Background MediaRecorder note:", err);
-      }
     }
 
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode manual aktif.', 'amber');
+        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode sentuh manual aktif.', 'amber');
         return;
       }
 
@@ -1541,19 +1464,25 @@
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.maxAlternatives = 5;
-        
-        // Bahasa pengenalan suara Arab
-        recognition.lang = 'ar-SA';
+        recognition.lang = 'ar-SA'; // Bahasa pengenalan suara Arab
 
         recognition.onstart = () => {
           liveState.isListening = true;
-          updateMobileStatusUI('Mikrofon HP Mendengarkan...', 'emerald');
+          updateMobileStatusUI('Mikrofon HP Mendengarkan Suara...', 'emerald');
+          const badge = document.getElementById('liveMicBadge');
+          if (badge) {
+            badge.className = 'text-[11px] flex items-center gap-1 text-emerald-400 font-semibold';
+            badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mic HP Mendengar';
+          }
         };
 
         recognition.onresult = (event) => {
           let fullTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            fullTranscript += event.results[i][0].transcript + ' ';
+            // Ambil semua alternatif pengenalan untuk toleransi dialek HP
+            for (let j = 0; j < event.results[i].length; j++) {
+              fullTranscript += ' ' + event.results[i][j].transcript;
+            }
           }
           if (fullTranscript.trim()) {
             handleRecognizedSpeech(fullTranscript);
@@ -1563,12 +1492,14 @@
         recognition.onerror = (e) => {
           console.log('Mobile Speech Recognition Status:', e.error);
           if (e.error === 'not-allowed') {
-            updateMobileStatusUI('Izin Mikrofon belum aktif. Ketuk "Segarkan Mic".', 'rose');
+            updateMobileStatusUI('Izin Mic belum aktif di HP. Ketuk "Segarkan Mic".', 'rose');
+          } else if (e.error === 'network') {
+            updateMobileStatusUI('Koneksi internet diperlukan untuk pengenalan suara HP.', 'amber');
           }
         };
 
         recognition.onend = () => {
-          // Keepalive otomatis untuk Android (langsung buka kembali saat jeda nafas)
+          // Keepalive otomatis untuk Android saat jeda nafas
           if (liveState.isListening) {
             setTimeout(() => {
               if (liveState.isListening) {
@@ -1576,7 +1507,7 @@
                   recognition.start();
                 } catch (err) {}
               }
-            }, 150);
+            }, 200);
           }
         };
 
@@ -1632,18 +1563,8 @@
         const wordLt = targetWordsLatin[idx] || '';
         const isWordMatched = isArabicWordMatched(wordAr, wordLt, transcript, spokenTokens);
 
-        const wordEl = document.getElementById(`ayah-word-${idx}`);
-        const chipEl = document.getElementById(`word-chip-${idx}`);
-
         if (isWordMatched) {
-          liveState.matchedWordIndices.add(idx);
-          if (wordEl) {
-            wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/60 shadow-md shadow-emerald-500/20 font-bold transition-all duration-200';
-          }
-          if (chipEl) {
-            chipEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 font-bold';
-            chipEl.innerHTML = `✓ ${wordAr}`;
-          }
+          markWordTokenSuccess(idx, wordAr);
         }
       });
 
@@ -1654,11 +1575,42 @@
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
-      // Otomatisasi AI: Tuntas Benar (Toleransi bacaan 70% atau tinggal 1 kata pendek)
-      if (matchScore >= 70 || liveState.matchedWordIndices.size >= Math.max(1, totalWords - 1)) {
+      // Otomatisasi AI: Tuntas Benar jika membaca >= 65% kata atau tinggal 1 kata
+      if (matchScore >= 65 || (totalWords > 1 && liveState.matchedWordIndices.size >= totalWords - 1)) {
         document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         
+        triggerAutoAdvance(true);
+      }
+    }
+
+    function markWordTokenSuccess(idx, wordAr) {
+      liveState.matchedWordIndices.add(idx);
+      const wordEl = document.getElementById(`ayah-word-${idx}`);
+      const chipEl = document.getElementById(`word-chip-${idx}`);
+
+      if (wordEl) {
+        wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-xl border border-emerald-500/60 shadow-md shadow-emerald-500/20 font-bold transition-all duration-200 cursor-pointer';
+      }
+      if (chipEl) {
+        chipEl.className = 'text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 font-bold';
+        chipEl.innerHTML = `✓ ${wordAr || ''}`;
+      }
+    }
+
+    // Interactive Touch Support (Bisa disentuh jika siswa/guru ingin memvalidasi langsung saat bising)
+    function onTouchAyahWord(idx) {
+      if (!liveState.currentAyahWords || !liveState.currentAyahWords[idx]) return;
+      markWordTokenSuccess(idx, liveState.currentAyahWords[idx]);
+      
+      const totalWords = liveState.currentAyahWords.length;
+      const matchScore = totalWords > 0 ? Math.min(100, Math.round((liveState.matchedWordIndices.size / totalWords) * 100)) : 100;
+      document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
+      document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
+
+      if (matchScore >= 65 || liveState.matchedWordIndices.size >= totalWords - 1) {
+        document.getElementById('liveCurrentAyahLabel').className = 'text-xs font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-500/70 shadow-lg shadow-emerald-500/30 animate-pulse';
+        document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         triggerAutoAdvance(true);
       }
     }
@@ -1673,23 +1625,7 @@
         if (countdownEl) countdownEl.classList.add('hidden');
         liveState.autoAdvanceTimer = null;
         markCurrentAyah(isSuccess, errorMessage);
-      }, 1100);
-    }
-
-    function highlightUnmatchedWords(targetWordsAr) {
-      targetWordsAr.forEach((wordAr, idx) => {
-        if (!liveState.matchedWordIndices.has(idx)) {
-          const wordEl = document.getElementById(`ayah-word-${idx}`);
-          const chipEl = document.getElementById(`word-chip-${idx}`);
-          if (wordEl) {
-            wordEl.className = 'ayah-word-token text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded-lg border border-rose-500/40 animate-pulse';
-          }
-          if (chipEl) {
-            chipEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-rose-900/80 text-rose-300 border border-rose-500/40 font-semibold';
-            chipEl.innerHTML = `✗ ${wordAr}`;
-          }
-        }
-      });
+      }, 1000);
     }
 
     function startLiveTimer() {
@@ -1729,12 +1665,12 @@
 
       const arabicContainer = document.getElementById('liveArabicText');
       arabicContainer.innerHTML = words.map((w, wIdx) => `
-        <span id="ayah-word-${wIdx}" class="ayah-word-token px-1.5 py-0.5 rounded-lg transition-all duration-300">${w}</span>
+        <span id="ayah-word-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="ayah-word-token px-2 py-0.5 rounded-xl border border-transparent hover:border-slate-700 transition-all duration-300">${w}</span>
       `).join(' ');
 
       const trackerContainer = document.getElementById('liveWordTracker');
       trackerContainer.innerHTML = words.map((w, wIdx) => `
-        <span id="word-chip-${wIdx}" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 transition-all font-mono">
+        <span id="word-chip-${wIdx}" onclick="onTouchAyahWord(${wIdx})" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 transition-all font-mono cursor-pointer">
           ⚪ ${w}
         </span>
       `).join('');
@@ -1782,12 +1718,6 @@
       if (liveState.speechRecognition) {
         liveState.isListening = false;
         try { liveState.speechRecognition.stop(); } catch (e) {}
-      }
-      if (liveState.mediaRecorder && liveState.mediaRecorder.state !== 'inactive') {
-        liveState.mediaRecorder.stop();
-      }
-      if (liveState.animFrameId) {
-        cancelAnimationFrame(liveState.animFrameId);
       }
 
       const total = liveState.totalAyahs;
@@ -1856,7 +1786,7 @@
       localHistory.unshift(payload);
       localStorage.setItem('preview_tasmi_history', JSON.stringify(localHistory));
 
-      // Kirim ke Google Apps Script Web App Backend via POST / GET
+      // Kirim ke Google Apps Script Web App Backend
       if (isGASRuntime()) {
         google.script.run.apiSaveTasmiSession(payload);
       } else {
