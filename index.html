@@ -372,7 +372,7 @@
           </div>
         </div>
 
-        <div class="glass-card p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
+        <div class="glass-card p-3.5 rounded-2xl border border-purple-500/20 flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-lg">
             🕒
           </div>
@@ -505,15 +505,19 @@
             </div>
           </div>
 
-          <!-- Language Engine Toggle for Android -->
+          <!-- Language Engine Toggle & Simulation Tool -->
           <div class="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-            <span class="text-slate-400">Mode Deteksi Suara:</span>
+            <span class="text-slate-400">Mode Suara:</span>
             <div class="flex items-center space-x-1.5">
               <button id="btnLangArabic" onclick="switchSpeechLang('ar-SA')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-bold border border-emerald-400/40 transition">
-                🇸🇦 Bahasa Arab
+                🇸🇦 Arab
               </button>
               <button id="btnLangIndo" onclick="switchSpeechLang('id-ID')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold border border-slate-700 hover:text-white transition">
-                🇮🇩 Fonetik Latin
+                🇮🇩 Latin
+              </button>
+              <!-- Simulation button for instant testing -->
+              <button onclick="simulateVoiceRecognition()" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 hover:bg-amber-500/30 transition" title="Simulasi Suara Santri untuk Tes Cepat">
+                ⚡ Tes Baca
               </button>
               <button onclick="restartMobileSpeechRecognition()" class="px-2 py-0.5 rounded-lg bg-blue-600/30 text-blue-300 font-semibold border border-blue-400/30" title="Segarkan Mic">
                 🔄
@@ -640,8 +644,8 @@
             <span id="audioDurationText" class="text-[11px] font-mono text-slate-400">00:00</span>
           </div>
 
-          <!-- Audio element -->
-          <audio id="recordedAudioPlayer" class="w-full h-10 rounded-lg outline-none" controls></audio>
+          <!-- Audio element with robust playback controls -->
+          <audio id="recordedAudioPlayer" class="w-full h-10 rounded-lg outline-none bg-slate-900" controls preload="auto"></audio>
 
           <div class="flex items-center justify-between pt-1">
             <p class="text-[10px] text-slate-400">Dengarkan kembali untuk verifikasi tajwid & hafalan.</p>
@@ -851,7 +855,6 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT: LOGIKA APLIKASI, AI SPEECH ENGINE ANDROID, & FUZZY MATCHING -->
   <script>
     /* ===============================================================
        1. DATA AL-QUR'AN (JUZ 30 LENGKAP & PROMINENT SURAHS DATASET)
@@ -964,9 +967,11 @@
       errorsList: [],
       timerSeconds: 0,
       timerInterval: null,
+      mediaStream: null,
       mediaRecorder: null,
       audioChunks: [],
       recordedAudioBlob: null,
+      audioMimeType: 'audio/webm',
       speechRecognition: null,
       isListening: false,
       isRecognitionRunning: false,
@@ -1480,6 +1485,64 @@
       }
     }
 
+    async function startAudioRecordingStream() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        liveState.mediaStream = stream;
+
+        // Detect supported MIME type
+        let mimeType = 'audio/webm';
+        if (typeof MediaRecorder !== 'undefined') {
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            mimeType = 'audio/webm;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            mimeType = 'audio/mp4';
+          } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+            mimeType = 'audio/ogg';
+          } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+            mimeType = 'audio/wav';
+          }
+
+          liveState.audioMimeType = mimeType;
+          const recorder = new MediaRecorder(stream, { mimeType });
+          liveState.audioChunks = [];
+
+          recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              liveState.audioChunks.push(e.data);
+            }
+          };
+
+          recorder.onstop = () => {
+            if (liveState.audioChunks.length > 0) {
+              const audioBlob = new Blob(liveState.audioChunks, { type: liveState.audioMimeType });
+              liveState.recordedAudioBlob = audioBlob;
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const player = document.getElementById('recordedAudioPlayer');
+              if (player) {
+                player.src = audioUrl;
+                player.load();
+              }
+              const dlBtn = document.getElementById('downloadAudioBtn');
+              if (dlBtn) {
+                dlBtn.href = audioUrl;
+                const ext = liveState.audioMimeType.includes('mp4') ? 'mp4' : (liveState.audioMimeType.includes('wav') ? 'wav' : 'webm');
+                dlBtn.download = `Tasmi_${liveState.surah ? liveState.surah.name : 'Santri'}_Ayat_${liveState.startAyah}-${liveState.endAyah}.${ext}`;
+              }
+            }
+          };
+
+          recorder.start(500); // chunk every 500ms for safety
+          liveState.mediaRecorder = recorder;
+        }
+
+        initLiveAudioWave(stream);
+      } catch (e) {
+        console.log("MediaRecorder init notice:", e);
+      }
+    }
+
     function switchSpeechLang(langCode) {
       currentSpeechLang = langCode;
       const btnAr = document.getElementById('btnLangArabic');
@@ -1524,9 +1587,11 @@
         errorsList: [],
         timerSeconds: 0,
         timerInterval: null,
+        mediaStream: null,
         mediaRecorder: null,
         audioChunks: [],
         recordedAudioBlob: null,
+        audioMimeType: 'audio/webm',
         speechRecognition: null,
         isListening: true,
         isRecognitionRunning: false,
@@ -1547,12 +1612,8 @@
       startLiveTimer();
       renderCurrentLiveAyah();
 
-      // Request stream untuk Audio Wave Visualizer
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(stream => initLiveAudioWave(stream))
-          .catch(e => console.log("Visualizer mic stream skipped:", e));
-      }
+      // Mulai Recording Audio Stream & Visualizer
+      startAudioRecordingStream();
 
       // Inisialisasi Speech Recognition LANGSUNG secara sinkron
       initSpeechRecognition();
@@ -1562,7 +1623,7 @@
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode sentuh manual aktif.', 'amber');
+        updateMobileStatusUI('Browser HP tidak mendukung Web Speech. Mode sentuh kata aktif.', 'amber');
         return;
       }
 
@@ -1613,7 +1674,7 @@
           if (e.error === 'not-allowed') {
             updateMobileStatusUI('Izin Mic ditolak. Ketuk "Segarkan Mic".', 'rose');
           } else if (e.error === 'network') {
-            updateMobileStatusUI('Koneksi internet diperlukan. Coba ubah mode ke Fonetik Latin.', 'amber');
+            updateMobileStatusUI('Koneksi internet diperlukan. Coba ubah mode ke Latin.', 'amber');
           } else if (e.error === 'no-speech') {
             updateMobileStatusUI('Menyimak suara bacaan santri...', 'emerald');
           }
@@ -1720,7 +1781,7 @@
       }
     }
 
-    // Interactive Touch Support
+    // Interactive Touch Support (Bantuan jika lingkungan bising)
     function onTouchAyahWord(idx) {
       if (!liveState.currentAyahWords || !liveState.currentAyahWords[idx]) return;
       markWordTokenSuccess(idx, liveState.currentAyahWords[idx]);
@@ -1735,6 +1796,18 @@
         document.getElementById('liveCurrentAyahLabel').innerHTML = `🟢 Ayat ${liveState.currentAyahIndex} Tuntas Terdeteksi!`;
         triggerAutoAdvance(true);
       }
+    }
+
+    // Fast Recitation Simulator for instant verification
+    function simulateVoiceRecognition() {
+      const currentKey = `${liveState.surah.number}_${liveState.currentAyahIndex}`;
+      const targetAyah = AYAT_DATABASE[currentKey];
+      if (!targetAyah) {
+        triggerAutoAdvance(true);
+        return;
+      }
+      handleRecognizedSpeech(targetAyah.ar);
+      showToast('Simulasi suara santri dijalankan!', '⚡');
     }
 
     function triggerAutoAdvance(isSuccess, errorMessage = '') {
@@ -1842,9 +1915,26 @@
         try { liveState.audioContext.close(); } catch(e) {}
       }
 
+      // Stop speech recognition
       if (liveState.speechRecognition) {
         liveState.isListening = false;
         try { liveState.speechRecognition.stop(); } catch (e) {}
+      }
+
+      // Stop MediaRecorder and trigger onstop
+      if (liveState.mediaRecorder && liveState.mediaRecorder.state !== 'inactive') {
+        try {
+          liveState.mediaRecorder.stop();
+        } catch (e) {
+          console.log("MediaRecorder stop notice:", e);
+        }
+      }
+
+      // Release mic stream tracks
+      if (liveState.mediaStream) {
+        try {
+          liveState.mediaStream.getTracks().forEach(track => track.stop());
+        } catch (e) {}
       }
 
       const total = liveState.totalAyahs;
