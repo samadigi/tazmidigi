@@ -1638,54 +1638,71 @@
     }
 
     async function startLiveTasmiSession() {
-      const studentName = document.getElementById('inputStudentName').value.trim() || 'Santri Tasmi';
-      const selectJuz = document.getElementById('selectJuz');
-      const selectSurah = document.getElementById('selectSurah');
-      
-      const juz = parseInt(selectJuz.value);
-      const surahNum = parseInt(selectSurah.value);
-      const surah = QURAN_SURAHS.find(s => s.number === surahNum) || QURAN_SURAHS[1];
-      const startAyah = parseInt(document.getElementById('inputAyahStart').value) || 1;
-      const endAyah = parseInt(document.getElementById('inputAyahEnd').value) || 10;
+      try {
+        const studentNameInput = document.getElementById('inputStudentName');
+        const studentName = (studentNameInput && studentNameInput.value.trim()) || 'Santri Tasmi';
+        const selectJuz = document.getElementById('selectJuz');
+        const selectSurah = document.getElementById('selectSurah');
+        
+        const juz = selectJuz ? parseInt(selectJuz.value) : 30;
+        const surahNum = selectSurah ? parseInt(selectSurah.value) : 78;
+        const surah = QURAN_SURAHS.find(s => s.number === surahNum) || QURAN_SURAHS[1];
+        const startAyah = parseInt(document.getElementById('inputAyahStart').value) || 1;
+        const endAyah = parseInt(document.getElementById('inputAyahEnd').value) || 10;
 
-      liveState = {
-        studentName: studentName,
-        juz: juz,
-        surah: surah,
-        startAyah: startAyah,
-        endAyah: endAyah,
-        currentAyahIndex: startAyah,
-        totalAyahs: (endAyah - startAyah + 1),
-        correctCount: 0,
-        errorCount: 0,
-        errorsList: [],
-        timerSeconds: 0,
-        timerInterval: null,
-        mediaStream: null,
-        mediaRecorder: null,
-        audioChunks: [],
-        recordedAudioBlob: null,
-        audioMimeType: 'audio/webm',
-        speechRecognition: null,
-        isListening: true,
-        isRecognitionRunning: false,
-        currentAyahWords: [],
-        matchedWordIndices: new Set(),
-        autoAdvanceTimer: null,
-        audioContext: null,
-        analyserNode: null,
-        waveAnimFrame: null
-      };
+        liveState = {
+          studentName: studentName,
+          juz: juz,
+          surah: surah,
+          startAyah: startAyah,
+          endAyah: endAyah,
+          currentAyahIndex: startAyah,
+          totalAyahs: (endAyah - startAyah + 1),
+          correctCount: 0,
+          errorCount: 0,
+          errorsList: [],
+          timerSeconds: 0,
+          timerInterval: null,
+          mediaStream: null,
+          mediaRecorder: null,
+          audioChunks: [],
+          recordedAudioBlob: null,
+          audioMimeType: 'audio/webm',
+          speechRecognition: null,
+          isListening: true,
+          isRecognitionRunning: false,
+          currentAyahWords: [],
+          matchedWordIndices: new Set(),
+          autoAdvanceTimer: null,
+          audioContext: null,
+          analyserNode: null,
+          waveAnimFrame: null
+        };
 
-      document.getElementById('tasmi-step-setup').classList.add('hidden');
-      document.getElementById('tasmi-step-live').classList.remove('hidden');
-      document.getElementById('tasmi-step-result').classList.add('hidden');
+        document.getElementById('tasmi-step-setup').classList.add('hidden');
+        document.getElementById('tasmi-step-live').classList.remove('hidden');
+        document.getElementById('tasmi-step-result').classList.add('hidden');
 
-      startLiveTimer();
-      renderCurrentLiveAyah();
-      startAudioRecordingStream();
-      initSpeechRecognition();
-      showToast('Sesi dimulai! Silakan membaca hafalan...', '🎙️');
+        startLiveTimer();
+        renderCurrentLiveAyah();
+
+        try {
+          await startAudioRecordingStream();
+        } catch (recErr) {
+          console.warn("Audio recording warning:", recErr);
+        }
+
+        try {
+          initSpeechRecognition();
+        } catch (speechErr) {
+          console.warn("Speech recognition warning:", speechErr);
+        }
+
+        showToast('Sesi dimulai! Silakan membaca hafalan...', '🎙️');
+      } catch (err) {
+        console.error("Error starting tasmi session:", err);
+        showToast('Terjadi kendala memulai sesi: ' + err.message, '⚠️');
+      }
     }
 
     function initSpeechRecognition() {
@@ -1806,7 +1823,8 @@
       });
 
       const totalWords = targetWordsAr.length;
-      const matchScore = totalWords > 0 ? Math.min(100, Math.round((liveState.matchedWordIndices.size / totalWords) * 100)) : 100;
+      const rawMatch = totalWords > 0 ? Math.round((liveState.matchedWordIndices.size / totalWords) * 100) : 100;
+      const matchScore = Math.min(100, Math.max(0, rawMatch));
       
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
@@ -1819,17 +1837,16 @@
       }
     }
 
-    function markWordTokenSuccess(idx, wordAr) {
+    function markWordTokenSuccess(idx, word) {
       liveState.matchedWordIndices.add(idx);
       const wordEl = document.getElementById(`ayah-word-${idx}`);
       const chipEl = document.getElementById(`word-chip-${idx}`);
-
       if (wordEl) {
-        wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-500/60 shadow-md shadow-emerald-500/20 font-bold transition-all duration-200 cursor-pointer';
+        wordEl.className = 'ayah-word-token text-emerald-400 bg-emerald-950/70 px-3 py-1 rounded-2xl border border-emerald-500/50 shadow-sm transition-all duration-300 scale-105';
       }
       if (chipEl) {
-        chipEl.className = 'text-xs px-3 py-1 rounded-full bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 font-bold';
-        chipEl.innerHTML = `✓ ${wordAr || ''}`;
+        chipEl.className = 'text-xs px-3 py-1 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-500/50 font-semibold cursor-pointer';
+        chipEl.innerHTML = `✓ ${word || ''}`;
       }
     }
 
@@ -1838,7 +1855,8 @@
       markWordTokenSuccess(idx, liveState.currentAyahWords[idx]);
       
       const totalWords = liveState.currentAyahWords.length;
-      const matchScore = totalWords > 0 ? Math.min(100, Math.round((liveState.matchedWordIndices.size / totalWords) * 100)) : 100;
+      const rawMatch = totalWords > 0 ? Math.round((liveState.matchedWordIndices.size / totalWords) * 100) : 100;
+      const matchScore = Math.min(100, Math.max(0, rawMatch));
       document.getElementById('liveMatchBadge').innerText = `Kecocokan: ${matchScore}%`;
       document.getElementById('liveMatchMeter').style.width = `${matchScore}%`;
 
@@ -1928,8 +1946,9 @@
       const completedSoFar = liveState.currentAyahIndex - liveState.startAyah + 1;
       document.getElementById('liveProgress').innerText = `${completedSoFar} / ${liveState.totalAyahs}`;
       
-      const currentScore = liveState.totalAyahs > 0 ? Math.round((liveState.correctCount / Math.max(1, completedSoFar - 1)) * 100) : 100;
-      document.getElementById('liveAccuracy').innerText = `${Math.min(100, Math.max(60, currentScore || 100))}%`;
+      const completedAyahs = Math.max(0, completedSoFar - 1);
+      const currentScore = completedAyahs > 0 ? Math.min(100, Math.max(0, Math.round((liveState.correctCount / completedAyahs) * 100))) : 100;
+      document.getElementById('liveAccuracy').innerText = `${Math.min(100, Math.max(0, currentScore))}%`;
       document.getElementById('liveErrors').innerText = liveState.errorCount;
     }
 
@@ -1978,9 +1997,9 @@
         try { liveState.mediaStream.getTracks().forEach(track => track.stop()); } catch (e) {}
       }
 
-      const total = liveState.totalAyahs;
-      const correct = liveState.correctCount;
-      const score = Math.max(0, Math.round((correct / total) * 100));
+      const total = Math.max(1, liveState.totalAyahs);
+      const correct = Math.min(liveState.correctCount, total);
+      const score = Math.min(100, Math.max(0, Math.round((correct / total) * 100)));
 
       document.getElementById('tasmi-step-live').classList.add('hidden');
       document.getElementById('tasmi-step-result').classList.remove('hidden');
@@ -2019,6 +2038,7 @@
     }
 
     function saveSessionResult(score) {
+      const sanitizedScore = Math.min(100, Math.max(0, Number(score) || 0));
       const payload = {
         userId: currentSessionUser ? currentSessionUser.userId : 'GUEST',
         studentName: liveState.studentName,
@@ -2028,9 +2048,9 @@
         startAyah: liveState.startAyah,
         endAyah: liveState.endAyah,
         totalAyah: liveState.totalAyahs,
-        correctAyah: liveState.correctCount,
+        correctAyah: Math.min(liveState.correctCount, liveState.totalAyahs),
         errorCount: liveState.errorCount,
-        accuracyScore: score,
+        accuracyScore: sanitizedScore,
         durationSeconds: liveState.timerSeconds,
         errorDetails: liveState.errorsList,
         audioUrl: '',
@@ -2073,13 +2093,13 @@
       } else {
         let history = JSON.parse(localStorage.getItem('preview_tasmi_history') || '[]');
         let total = history.length;
-        let avg = total > 0 ? Math.round(history.reduce((a, b) => a + (Number(b.accuracyScore) || 0), 0) / total) : 92;
+        let avg = total > 0 ? Math.min(100, Math.max(0, Math.round(history.reduce((a, b) => a + Math.min(100, Math.max(0, Number(b.accuracyScore) || 0)), 0) / total))) : 92;
         let last = total > 0 ? `${history[0].surahName} (${history[0].startAyah}-${history[0].endAyah})` : "An-Naba' (1-10)";
         
         updateDashboardUI({
           totalTasmi: Math.max(1, total),
           completedTasmi: Math.max(1, total),
-          avgScore: avg,
+          avgScore: Math.min(100, Math.max(0, avg)),
           lastTasmi: last
         }, history.slice(0, 4));
       }
@@ -2088,7 +2108,8 @@
     function updateDashboardUI(stats, recentList) {
       document.getElementById('metricTotal').innerText = stats.totalTasmi || 0;
       document.getElementById('metricCompleted').innerText = stats.completedTasmi || 0;
-      document.getElementById('metricAvgScore').innerText = `${stats.avgScore || 0}%`;
+      const displayAvg = Math.min(100, Math.max(0, Number(stats.avgScore) || 0));
+      document.getElementById('metricAvgScore').innerText = `${displayAvg}%`;
       document.getElementById('metricLast').innerText = stats.lastTasmi || '-';
 
       const recentContainer = document.getElementById('homeRecentList');
@@ -2099,19 +2120,21 @@
         return;
       }
 
-      recentContainer.innerHTML = recentList.map(item => `
+      recentContainer.innerHTML = recentList.map(item => {
+        const itemScore = Math.min(100, Math.max(0, Number(item.accuracyScore) || 0));
+        return `
         <div class="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
           <div class="space-y-1">
             <p class="text-sm font-bold text-white">${item.surahName} <span class="text-slate-400 font-normal">(${item.startAyah}-${item.endAyah})</span></p>
             <p class="text-xs text-slate-400">${item.studentName || 'Santri'} • Juz ${item.juz}</p>
           </div>
           <div class="text-right">
-            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${item.accuracyScore >= 80 ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/30' : 'bg-rose-950/70 text-rose-400 border border-rose-500/30'}">
-              ${item.accuracyScore}%
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${itemScore >= 80 ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-500/30' : 'bg-rose-950/70 text-rose-400 border border-rose-500/30'}">
+              ${itemScore}%
             </span>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function loadHistoryData() {
@@ -2140,15 +2163,17 @@
         return;
       }
 
-      container.innerHTML = list.map(item => `
+      container.innerHTML = list.map(item => {
+        const itemScore = Math.min(100, Math.max(0, Number(item.accuracyScore) || 0));
+        return `
         <div class="glass-card p-5 rounded-3xl border border-slate-800 space-y-3 hover:border-slate-700 transition">
           <div class="flex items-center justify-between">
             <div>
               <h4 class="text-base font-bold text-white">QS. ${item.surahName}</h4>
               <p class="text-xs text-slate-400">Ayat ${item.startAyah}–${item.endAyah} • Juz ${item.juz}</p>
             </div>
-            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${item.accuracyScore >= 80 ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40' : 'bg-amber-950/80 text-amber-400 border border-amber-500/40'}">
-              Nilai: ${item.accuracyScore}
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black ${itemScore >= 80 ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40' : 'bg-amber-950/80 text-amber-400 border border-amber-500/40'}">
+              Nilai: ${itemScore}
             </span>
           </div>
 
@@ -2157,7 +2182,7 @@
             <span>Kesalahan: <b class="${item.errorCount > 0 ? 'text-rose-400' : 'text-emerald-400'}">${item.errorCount}</b></span>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function filterHistory() {
